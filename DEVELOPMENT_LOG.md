@@ -97,6 +97,27 @@
   - 同步重写 `SKILL.md`, `WORKFLOW_SOP.md`, `ARCHITECTURE.md`, `REVIEW.md`；
   - 清理过期调试脚本与测试帧，配置 `.gitignore`，保留归档测试素材 `archive/session_explainer_assets_20260924.zip`。
 
+### 📅 [2026-09-24 17:45 - 18:05] Milestone 7: 《好帮手 AI 话术私教》手账折页视频全流程贯通 (AI Coach Studio Delivery)
+- **🎯 核心目标**：从 `human-ai-video-director` 摄取真实业务素材，验证 5 阶人机协同工作流在垂直业务（教育/保险/销售培训）下的实战表现。
+- **✅ 核心产出**：
+  - **素材吸纳与手账美学体系落地**：
+    - 摄取客户挂断记录、24关实战闯关卡、45分诊断报告、纸片人贴纸；
+    - 确立暖米白纸质底 (`#faf7ee`)、砖橙印泥环 (`#ea580c`) 与亮金高光 (`#f59e0b`) 的手账折页视觉规范；
+    - 产出 [tokens_ai-coach.json](file:///d:/video/视频3/hyper-presenter-studio/01_prototype_opendesign/tokens/tokens_ai-coach.json) 与 [prototype_ai-coach.html](file:///d:/video/视频3/hyper-presenter-studio/01_prototype_opendesign/prototype_ai-coach.html)；
+  - **60FPS 极客动效 B-Roll 渲染**：
+    - 编译 [output/broll_motion.mp4](file:///d:/video/视频3/hyper-presenter-studio/output/broll_motion.mp4) (2.8 MB, 10.4s, 1920×1080 @ 60FPS)；
+    - 提取 3 幕验证高清图：痛点秒挂 ➔ 24关对战 ➔ 45分体检逆袭；
+  - **专属 10s 拍摄指南与提词蓝图**：
+    - 生成 [03_presenter_aroll/CURRENT_SHOOTING_GUIDE.md](file:///d:/video/视频3/hyper-presenter-studio/03_presenter_aroll/CURRENT_SHOOTING_GUIDE.md) 与 9:16 移动版提词卡；
+  - **ChatCut 智能总装与剪映草稿直出**：
+    - 结合 EMA 人脸平滑追踪，完成 3 种成片直出：
+      - `dynamic_cutaways_1920x1080.mp4` (Method 3 多景别智能切镜成片)
+      - `split_presenter_1920x1080.mp4` (Method 2 全画幅无损演播室融合)
+      - `face_bubble_optimized_1920x1080.mp4` (Method 1 发光圆框动态居中)
+    - 自动在剪映 `root_meta_info.json` 注册工程并置顶；
+  - **Windows 文件系统鲁棒性加固**：
+    - 引入 `safe_unlink` 重试机制，消除并发与 FFmpeg 释放滞后引发的 `PermissionError: [WinError 32]` 异常。
+
 ---
 
 ## 🔮 未来演进规划 (Roadmap & Next Steps)

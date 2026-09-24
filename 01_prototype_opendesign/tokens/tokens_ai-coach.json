@@ -1,0 +1,51 @@
+{
+  "theme": "ai-coach",
+  "name": "好帮手 AI 话术私教 (杂志折页手账风)",
+  "aspect_ratio": "16:9",
+  "canvas": {
+    "width": 1920,
+    "height": 1080
+  },
+  "colors": {
+    "bg_paper": "#faf7ee",
+    "bg_card": "rgba(255, 255, 255, 0.94)",
+    "text_ink": "#1c1917",
+    "text_dim": "#78716c",
+    "accent_alert": "#dc2626",
+    "accent_highlighter": "#f59e0b",
+    "accent_success": "#15803d",
+    "border_sketch": "rgba(28, 25, 23, 0.18)",
+    "shadow_paper": "0 20px 50px rgba(44, 33, 24, 0.08), 0 4px 12px rgba(44, 33, 24, 0.04)"
+  },
+  "typography": {
+    "hero_title": "78px",
+    "section_title": "44px",
+    "card_title": "34px",
+    "body_text": "24px",
+    "font_main": "'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif",
+    "font_accent": "'Ma Shan Zheng', cursive"
+  },
+  "acts": [
+    {
+      "act": 1,
+      "name": "破局抛出 (The Hook)",
+      "duration": "00:00 - 03.2s",
+      "headline": "一开口就冷场？",
+      "subheadline": "打电话总是被秒挂？好帮手 AI 话术私教为你一秒破局！"
+    },
+    {
+      "act": 2,
+      "name": "核心对练 (The Core Demo)",
+      "duration": "03.2s - 07.5s",
+      "headline": "24 关实战地图 · AI 陪练实时拆招",
+      "subheadline": "沉浸式对战挑剔客户，金句弹幕高频推送，边练边通关！"
+    },
+    {
+      "act": 3,
+      "name": "深度体检 (The Outcome)",
+      "duration": "07.5s - 10.4s",
+      "headline": "精准能力体检 · 45 分逆袭直通销冠",
+      "subheadline": "话术得分全景诊断，利益前置精准破局，随时随地开练！"
+    }
+  ]
+}

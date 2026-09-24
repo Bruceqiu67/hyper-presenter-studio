@@ -123,6 +123,7 @@ stateDiagram-v2
 | **编译器隔离** | 同一动效目录下放置横屏 `index.html` 与竖屏 `index_vertical.html` 导致画幅混淆 | **单一 Root 契约**：根层级仅保留 `index.html`，备用模板严格隔离在 `templates/` 子目录 | `02_motion_hyperframes/templates/` |
 | **人脸追踪** | 固定框裁切导致人脸偏移出画；真人素材较短导致末尾黑屏会跳 | **OpenCV Haar + YCrCb 质心双模态检测** + EMA 平滑滤波 ($\alpha=0.18$) + 边界夹紧 + 最后一帧定格微笑 | `04_assembly_capcut/core_utils.py` |
 | **剪映集成** | 仅生成草稿目录，剪映“最近项目”不显示，需要用户手动导入 | **修改并重写 `root_meta_info.json`**，直接插入当前项目 draft ID 并刷新时间戳，实现桌面端打开即置顶 | `core_utils.register_jianying_draft_index()` |
+| **Windows 文件锁** | FFmpeg 进程释放延迟或多任务同时访问临时文件报 `PermissionError: [WinError 32]` | **实现 `safe_unlink` 带重试机制**，通过小步延时重试安全解除句柄，避免中断流水线 | `chatcut_auto_assembly.py:safe_unlink()` |
 
 ---
 
@@ -130,11 +131,17 @@ stateDiagram-v2
 
 ```text
 Visual Theme Tokens Architecture:
-├── ink-wash (现代新中式宣白水墨风) ★ 默认推荐
+├── ink-wash (现代新中式宣白水墨风) ★ 经典水墨推荐
 │   ├── bg: #fbfbfa (宣纸宣白) + assets/ink_wash_bg.jpg (意境山水)
 │   ├── typography: 76px+ Ma Shan Zheng (毛笔书法) + Noto Serif SC 900
 │   ├── accents: #dc2626 (朱砂印泥红) + #d97706 (琥珀金) + #18181b (浓墨黑)
 │   └── aura: 朱砂红光晕环 + 琥珀金高光线 (circle_ring_ink-wash.png)
+│
+├── ai-coach (杂志手账折页风) ★ 业务培训/营销推荐
+│   ├── bg: #faf7ee (暖米白宣纸) + 手账方格与折页纹理
+│   ├── typography: 72px+ 澎湃黑体/手账标题 + 荧光马克笔重点标注
+│   ├── accents: #ea580c (复古砖橙) + #f59e0b (琥珀暖金) + #ef4444 (警示红)
+│   └── aura: 暖金外晕 + 砖橙内实环 + 荧光亮金高光 (circle_ring_ai-coach.png)
 │
 ├── prismatic-aurora (极光五彩绚烂风)
 │   ├── bg: #11092a (深紫夜幕) + 弥散流光

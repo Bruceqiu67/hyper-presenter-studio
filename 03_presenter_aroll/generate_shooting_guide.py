@@ -54,6 +54,13 @@ def generate_guide_markdown(title: str, duration: int, core_command: str, ratio:
         script_act1 = "“告别繁琐安装，一行指令开启极简创作！”"
         script_act2 = f"“终端敲入 `{core_command}`，全流程秒级跑通！”"
         script_act3 = "“一键自动总装，广播级成片即刻出炉！”"
+    elif theme == "ai-coach":
+        cue_act1 = "杂志手账暖纸展卷，客户痛点秒挂纸片人红叉警示，荧光笔划出核心痛点"
+        cue_act2 = "24关拟真对战闯关卡铺展，对战音频声波流转，实战拆解动态浮现"
+        cue_act3 = "45分体检全面逆袭，五星战力评级炸裂，金色通关印章重磅钤印"
+        script_act1 = "“电话刚开口就被客户秒挂？别慌！”"
+        script_act2 = f"“好帮手 AI 话术私教，24 关真机拟真实战，招招拆解！”"
+        script_act3 = "“从 45 分到五星逆袭，让高转化成交像呼吸一样自然！”"
     else:
         cue_act1 = "终端窗口淡入，光标高频闪烁，准备就绪"
         cue_act2 = "键盘极客敲击声起，依赖安装条 0% 飙到 100%，绿色对勾亮起"

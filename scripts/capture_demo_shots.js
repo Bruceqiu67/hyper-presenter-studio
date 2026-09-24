@@ -13,10 +13,11 @@ async function capture() {
   const args = process.argv.slice(2);
   let htmlFile = '01_prototype_opendesign/prototype_ink-wash.html';
   let outDir = path.resolve(__dirname, '../output/screenshots');
-
+  let prefix = 'demo';
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--input' && args[i + 1]) htmlFile = args[i + 1];
     if (args[i] === '--output-dir' && args[i + 1]) outDir = args[i + 1];
+    if (args[i] === '--prefix' && args[i + 1]) prefix = args[i + 1];
   }
 
   // Ensure output directory exists
@@ -55,13 +56,13 @@ async function capture() {
       console.warn(`Note: switchAct not found, capturing static page for act ${act}`);
     }
 
-    const filename = `demo_act${act}.jpg`;
+    const filename = `${prefix}_act${act}.jpg`;
     const localShot = path.join(outDir, filename);
     await page.screenshot({ path: localShot, quality: 92, type: 'jpeg' });
     console.log(`  ✔ Act ${act} captured: ${localShot}`);
 
     if (hasArtifactDir) {
-      const artifactShot = path.join(artifactDir, `demo_inkwash_act${act}.jpg`);
+      const artifactShot = path.join(artifactDir, `${prefix}_act${act}.jpg`);
       fs.copyFileSync(localShot, artifactShot);
     }
   }

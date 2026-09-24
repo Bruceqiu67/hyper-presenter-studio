@@ -30,6 +30,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import core_utils
 
 
+def safe_unlink(path: Path):
+    """Safely unlink a file with retry to avoid Windows file lock race conditions."""
+    if not path or not path.exists():
+        return
+    for _ in range(5):
+        try:
+            path.unlink()
+            return
+        except Exception:
+            time.sleep(0.1)
+
+
 def assemble_method_bubble(root_dir: Path, broll_path: Path, presenter_path: Path, audio_path: Path, output_path: Path, ratio: str = "16:9", theme: str = "ink-wash"):
     """
     Method 1: Dynamic Centered Face Bubble.
@@ -121,8 +133,7 @@ def assemble_method_bubble(root_dir: Path, broll_path: Path, presenter_path: Pat
         print(f"❌ FFmpeg Error in Method 1: {proc.stderr}")
         raise RuntimeError("FFmpeg encoding failed.")
 
-    if temp_video.exists():
-        temp_video.unlink()
+    safe_unlink(temp_video)
     print(f"✅ Method 1 Complete! Output saved to: {output_path}")
 
 
@@ -213,8 +224,7 @@ def assemble_method_split(root_dir: Path, broll_path: Path, presenter_path: Path
         print(f"❌ FFmpeg Error in Method 2: {proc.stderr}")
         raise RuntimeError("FFmpeg encoding failed.")
 
-    if temp_video.exists():
-        temp_video.unlink()
+    safe_unlink(temp_video)
     print(f"✅ Method 2 Complete! Output saved to: {output_path}")
 
 
@@ -236,7 +246,7 @@ def assemble_method_dynamic(root_dir: Path, broll_path: Path, presenter_path: Pa
     shot3_out = root_dir / "output" / "temp_shot3.mp4"
 
     # Shot 1 (0 ~ 2.5s): Presenter Center Spotlight
-    pad_color = "0xfbfbfa" if theme == "ink-wash" else "0x0a0e17"
+    pad_color = "0xfbfbfa" if theme == "ink-wash" else ("0xfaf7ee" if theme == "ai-coach" else "0x0a0e17")
     cmd1 = [
         "ffmpeg", "-y",
         "-ss", "0.0", "-t", "2.5", "-i", str(presenter_path),
@@ -302,8 +312,7 @@ def assemble_method_dynamic(root_dir: Path, broll_path: Path, presenter_path: Pa
 
     # Cleanup temporary files
     for tmp in [shot1_out, shot2_out, shot3_out, shot2_full, shot3_full, concat_txt]:
-        if tmp.exists():
-            tmp.unlink()
+        safe_unlink(tmp)
 
     print(f"✅ Method 3 Complete! Output saved to: {output_path}")
 

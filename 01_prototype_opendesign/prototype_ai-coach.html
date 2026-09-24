@@ -3,39 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
-  <title>好帮手 AI 话术私教 - 杂志手账风 60FPS 代码动效 B-Roll</title>
+  <title>好帮手 AI 话术私教 - 杂志手账风 16:9 高保真演示原型</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@400;700;900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    html, body {
+    body {
       width: 1920px;
       height: 1080px;
       overflow: hidden;
       background-color: #faf7ee;
       font-family: 'Noto Sans SC', sans-serif;
       color: #1c1917;
-    }
-    #root {
       position: relative;
-      width: 1920px;
-      height: 1080px;
-      background-color: #faf7ee;
-      overflow: hidden;
     }
 
-    /* 手账纸张纹理与装订中缝 */
+    /* 纸张质感与手账装订中缝 */
     .paper-texture {
       position: absolute;
       inset: 0;
       background: 
-        radial-gradient(ellipse at 50% 30%, rgba(255, 255, 255, 0.65) 0%, rgba(245, 240, 225, 0.45) 100%),
+        radial-gradient(ellipse at 50% 30%, rgba(255, 255, 255, 0.6) 0%, rgba(245, 240, 225, 0.4) 100%),
         repeating-linear-gradient(0deg, rgba(28, 25, 23, 0.015) 0px, rgba(28, 25, 23, 0.015) 1px, transparent 1px, transparent 32px);
       pointer-events: none;
       z-index: 1;
@@ -110,6 +103,7 @@
       font-size: 17px;
       font-weight: 700;
       color: #78716c;
+      cursor: pointer;
       transition: all 0.25s ease;
     }
     .act-btn.active {
@@ -141,8 +135,14 @@
       position: absolute;
       inset: 0;
       opacity: 0;
-      transform: translateY(16px);
       pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(12px);
+    }
+    .act-view.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
     }
 
     /* 标题规范：76px+ 磅礴大字 */
@@ -156,23 +156,22 @@
       position: relative;
       display: inline-block;
     }
-    .highlight-marker {
+    .act-headline .highlight-marker {
       position: relative;
       z-index: 2;
     }
-    .marker-underline {
+    .act-headline .highlight-marker::after {
+      content: '';
       position: absolute;
       left: -6px;
       right: -6px;
-      bottom: 6px;
+      bottom: 8px;
       height: 22px;
-      background: rgba(245, 158, 11, 0.45);
+      background: rgba(245, 158, 11, 0.35);
       border-radius: 4px;
       z-index: -1;
-      transform-origin: left center;
-      transform: scaleX(0);
+      transform: rotate(-0.8deg);
     }
-
     .act-subheadline {
       font-size: 26px;
       color: #78716c;
@@ -257,8 +256,6 @@
       padding: 12px 18px;
       border-radius: 12px;
       border-left: 5px solid #dc2626;
-      opacity: 0;
-      transform: translateX(-15px);
     }
     .pain-item .cross {
       color: #dc2626;
@@ -326,7 +323,7 @@
       flex-direction: column;
       position: relative;
     }
-    .dialogue-card img.dialogue-img {
+    .dialogue-card img {
       width: 100%;
       height: 480px;
       object-fit: cover;
@@ -370,9 +367,13 @@
       right: 40px;
       width: 180px;
       height: 180px;
+      transform: rotate(-12deg);
       filter: drop-shadow(0 12px 24px rgba(220, 38, 38, 0.35));
-      opacity: 0;
-      transform: scale(2.8) rotate(25deg);
+      animation: stampDrop 0.6s ease;
+    }
+    @keyframes stampDrop {
+      0% { transform: scale(2.2) rotate(15deg); opacity: 0; }
+      100% { transform: scale(1) rotate(-12deg); opacity: 1; }
     }
 
     .outcome-card {
@@ -477,6 +478,11 @@
       border-radius: 50%;
       border: 4px solid #f59e0b;
       box-shadow: 0 0 40px rgba(245, 158, 11, 0.25), inset 0 0 20px rgba(245, 158, 11, 0.15);
+      animation: pulseGlow 3s infinite alternate;
+    }
+    @keyframes pulseGlow {
+      0% { transform: scale(0.98); opacity: 0.8; }
+      100% { transform: scale(1.02); opacity: 1; }
     }
     .stage-presenter-photo {
       position: relative;
@@ -495,210 +501,171 @@
   </style>
 </head>
 <body>
-  <div id="root" data-composition-id="main" data-width="1920" data-height="1080">
 
-    <!-- 手账纸张质感与装订中缝 -->
-    <div class="paper-texture"></div>
-    <div class="spine-crease"></div>
+  <!-- 手账纸张质感与装订中缝 -->
+  <div class="paper-texture"></div>
+  <div class="spine-crease"></div>
 
-    <!-- 顶部导航与控制器 -->
-    <header class="top-header">
-      <div class="brand-box">
-        <img src="assets/好帮手APP图标.png" alt="好帮手Logo" class="brand-logo">
-        <div class="brand-title">好帮手 AI 话术私教</div>
-        <span class="brand-tag">24关实战地图 · AI助学</span>
+  <!-- 顶部导航与控制器 -->
+  <header class="top-header">
+    <div class="brand-box">
+      <img src="../assets/ai_coach/好帮手APP图标.png" alt="好帮手Logo" class="brand-logo">
+      <div class="brand-title">好帮手 AI 话术私教</div>
+      <span class="brand-tag">24关实战地图 · AI助学</span>
+    </div>
+
+    <!-- 幕次交互切换器 -->
+    <div class="act-switcher">
+      <button class="act-btn active" id="btn-act1" onclick="switchAct(1)">第 1 幕 · 痛点秒挂</button>
+      <button class="act-btn" id="btn-act2" onclick="switchAct(2)">第 2 幕 · 核心对练</button>
+      <button class="act-btn" id="btn-act3" onclick="switchAct(3)">第 3 幕 · 深度体检</button>
+    </div>
+  </header>
+
+  <!-- 主画布区域：100% 原始尺寸无损呈现 -->
+  <main class="canvas-layout">
+    
+    <!-- 左侧主要演示区 (三幕动态切页) -->
+    <section class="act-stage">
+
+      <!-- 第一幕：痛点秒挂 (00:00 - 03.2s) -->
+      <div class="act-view active" id="view-act1">
+        <h1 class="act-headline">
+          <span class="highlight-marker">一开口就冷场？</span>
+        </h1>
+        <div class="act-subheadline">
+          <span class="act-badge">第 1 幕 · 痛点破局</span>
+          <span>打电话总是被秒挂？好帮手 AI 私教为你破局！</span>
+        </div>
+
+        <div class="act1-grid">
+          <div class="pain-card">
+            <div class="sticky-note">❌ 客户：不需要，别再打了！</div>
+            <div class="hangup-circle">
+              <img src="../assets/ai_coach/button_hangup_transparent.png" alt="挂断红钮">
+            </div>
+            <ul class="pain-list">
+              <li class="pain-item"><span class="cross">✕</span> 照本宣科，开场 3 秒即遭挂机</li>
+              <li class="pain-item"><span class="cross">✕</span> 面对客户质疑，大脑瞬间空白</li>
+              <li class="pain-item"><span class="cross">✕</span> 传统纸质话术，死记硬背效率极低</li>
+            </ul>
+          </div>
+
+          <div class="caller-poster">
+            <img src="../assets/ai_coach/动作1 · 打电话被拒.png" alt="纸片人打电话被拒">
+          </div>
+        </div>
       </div>
 
-      <!-- 幕次交互切换器 -->
-      <div class="act-switcher">
-        <div class="act-btn active" id="btn-act1">第 1 幕 · 痛点秒挂</div>
-        <div class="act-btn" id="btn-act2">第 2 幕 · 核心对练</div>
-        <div class="act-btn" id="btn-act3">第 3 幕 · 深度体检</div>
-      </div>
-    </header>
+      <!-- 第二幕：核心实战对练 (03.2s - 07.5s) -->
+      <div class="act-view" id="view-act2">
+        <h1 class="act-headline">
+          <span class="highlight-marker">24 关实战地图 · AI 陪练随时开战</span>
+        </h1>
+        <div class="act-subheadline">
+          <span class="act-badge" style="background:#f59e0b;">第 2 幕 · 核心演示</span>
+          <span>沉浸式模拟挑剔客户，实时拆解话术，智能通关！</span>
+        </div>
 
-    <!-- 主画布区域：100% 原始尺寸无损呈现 -->
-    <main class="canvas-layout">
+        <div class="act2-grid">
+          <div class="map-card">
+            <img src="../assets/ai_coach/话术私教1.jpg" alt="24关实战地图">
+            <div class="card-footer-title">
+              <span>🗺️ 循序渐进闯关体系</span>
+              <span style="color:#f59e0b; font-size:18px;">开场白 ➔ 报价 ➔ 促成</span>
+            </div>
+          </div>
+
+          <div class="dialogue-card">
+            <img src="../assets/ai_coach/话术私教2.jpg" alt="AI模拟对战界面">
+            <img src="../assets/ai_coach/动作4 · 食指朝上顿悟.png" alt="顿悟贴纸" class="insight-sticker">
+            <div class="card-footer-title">
+              <span>🎙️ 挑剔客户实时对战</span>
+              <span style="color:#16a34a; font-size:18px;">实时金句推荐 ✔</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 第三幕：深度体检与成效 (07.5s - 10.4s) -->
+      <div class="act-view" id="view-act3">
+        <h1 class="act-headline">
+          <span class="highlight-marker">精准能力体检 · 直通销售冠军</span>
+        </h1>
+        <div class="act-subheadline">
+          <span class="act-badge" style="background:#16a34a;">第 3 幕 · 终极交付</span>
+          <span>全方位雷达扫描，利益前置诊断，彻底告别盲练！</span>
+        </div>
+
+        <div class="act3-grid">
+          <div class="report-card">
+            <img src="../assets/ai_coach/话术私教3.jpg" alt="深度体检单" class="report-img">
+            <img src="../assets/ai_coach/stamp_45_score_transparent.png" alt="45分盖印" class="stamp-overlay">
+          </div>
+
+          <div class="outcome-card">
+            <div>
+              <h2 style="font-size:32px; font-weight:900; margin-bottom:12px;">📊 30 天能力逆袭跃迁</h2>
+              <p style="font-size:18px; color:#78716c; line-height:1.5;">系统自动提炼弱项话术，将“自说自话”转化为“客户利益前置”，胜率倍增！</p>
+            </div>
+
+            <div class="score-leap-box">
+              <div class="score-block">
+                <div class="score-title">初始测试分</div>
+                <div class="score-num bad">45</div>
+              </div>
+              <div class="score-arrow">➔</div>
+              <div class="score-block">
+                <div class="score-title">通关实战分</div>
+                <div class="score-num good">96</div>
+              </div>
+            </div>
+
+            <div class="cta-banner">
+              <div class="cta-text">好帮手 AI 话术私教 · 立即开练</div>
+              <div class="cta-btn">扫码体验</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 右侧演播室舞台融合区 (Stage Pedestal) -->
+    <aside class="studio-stage">
+      <div class="stage-badge">100% 原始无损尺寸 · 演播室人景融合区</div>
       
-      <!-- 左侧主要演示区 (三幕动态切页) -->
-      <section class="act-stage">
+      <div class="stage-pedestal">
+        <div class="pedestal-ring"></div>
+        <img src="../assets/ai_coach/贴纸_点赞.png" alt="主讲人立牌" class="stage-presenter-photo" id="stage-avatar">
+      </div>
 
-        <!-- 第一幕：痛点秒挂 (00:00 - 03.2s) -->
-        <div class="act-view" id="view-act1" style="opacity: 1; transform: translateY(0);">
-          <h1 class="act-headline">
-            <span class="highlight-marker">一开口就冷场？</span>
-            <span class="marker-underline" id="underline-act1"></span>
-          </h1>
-          <div class="act-subheadline">
-            <span class="act-badge">第 1 幕 · 痛点破局</span>
-            <span>打电话总是被秒挂？好帮手 AI 私教为你破局！</span>
-          </div>
+      <div class="stage-desc">
+        右侧专属融合演播台<br>
+        保留完整左屏细节，杜绝内容缩小看不清
+      </div>
+    </aside>
 
-          <div class="act1-grid">
-            <div class="pain-card" id="pain-card">
-              <div class="sticky-note" id="sticky-note">❌ 客户：不需要，别再打了！</div>
-              <div class="hangup-circle">
-                <img src="assets/button_hangup_transparent.png" alt="挂断红钮" id="hangup-icon">
-              </div>
-              <ul class="pain-list">
-                <li class="pain-item" id="pain-item-1"><span class="cross">✕</span> 照本宣科，开场 3 秒即遭挂机</li>
-                <li class="pain-item" id="pain-item-2"><span class="cross">✕</span> 面对客户质疑，大脑瞬间空白</li>
-                <li class="pain-item" id="pain-item-3"><span class="cross">✕</span> 传统纸质话术，死记硬背效率极低</li>
-              </ul>
-            </div>
-
-            <div class="caller-poster" id="caller-poster">
-              <img src="assets/动作1 · 打电话被拒.png" alt="纸片人打电话被拒">
-            </div>
-          </div>
-        </div>
-
-        <!-- 第二幕：核心实战对练 (03.2s - 07.5s) -->
-        <div class="act-view" id="view-act2">
-          <h1 class="act-headline">
-            <span class="highlight-marker">24 关实战地图 · AI 陪练随时开战</span>
-            <span class="marker-underline" id="underline-act2"></span>
-          </h1>
-          <div class="act-subheadline">
-            <span class="act-badge" style="background:#f59e0b;">第 2 幕 · 核心演示</span>
-            <span>沉浸式模拟挑剔客户，实时拆解话术，智能通关！</span>
-          </div>
-
-          <div class="act2-grid">
-            <div class="map-card" id="map-card">
-              <img src="assets/话术私教1.jpg" alt="24关实战地图">
-              <div class="card-footer-title">
-                <span>🗺️ 循序渐进闯关体系</span>
-                <span style="color:#f59e0b; font-size:18px;">开场白 ➔ 报价 ➔ 促成</span>
-              </div>
-            </div>
-
-            <div class="dialogue-card" id="dialogue-card">
-              <img src="assets/话术私教2.jpg" alt="AI模拟对战界面" class="dialogue-img">
-              <img src="assets/动作4 · 食指朝上顿悟.png" alt="顿悟贴纸" class="insight-sticker" id="insight-sticker">
-              <div class="card-footer-title">
-                <span>🎙️ 挑剔客户实时对战</span>
-                <span style="color:#16a34a; font-size:18px;">实时金句推荐 ✔</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 第三幕：深度体检与成效 (07.5s - 10.4s) -->
-        <div class="act-view" id="view-act3">
-          <h1 class="act-headline">
-            <span class="highlight-marker">精准能力体检 · 直通销售冠军</span>
-            <span class="marker-underline" id="underline-act3"></span>
-          </h1>
-          <div class="act-subheadline">
-            <span class="act-badge" style="background:#16a34a;">第 3 幕 · 终极交付</span>
-            <span>全方位雷达扫描，利益前置诊断，彻底告别盲练！</span>
-          </div>
-
-          <div class="act3-grid">
-            <div class="report-card" id="report-card">
-              <img src="assets/话术私教3.jpg" alt="深度体检单" class="report-img">
-              <img src="assets/stamp_45_score_transparent.png" alt="45分盖印" class="stamp-overlay" id="stamp-img">
-            </div>
-
-            <div class="outcome-card" id="outcome-card">
-              <div>
-                <h2 style="font-size:32px; font-weight:900; margin-bottom:12px;">📊 30 天能力逆袭跃迁</h2>
-                <p style="font-size:18px; color:#78716c; line-height:1.5;">系统自动提炼弱项话术，将“自说自话”转化为“客户利益前置”，胜率倍增！</p>
-              </div>
-
-              <div class="score-leap-box">
-                <div class="score-block">
-                  <div class="score-title">初始测试分</div>
-                  <div class="score-num bad">45</div>
-                </div>
-                <div class="score-arrow">➔</div>
-                <div class="score-block">
-                  <div class="score-title">通关实战分</div>
-                  <div class="score-num good" id="final-score">96</div>
-                </div>
-              </div>
-
-              <div class="cta-banner">
-                <div class="cta-text">好帮手 AI 话术私教 · 立即开练</div>
-                <div class="cta-btn">扫码体验</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- 右侧演播室舞台融合区 (Stage Pedestal) -->
-      <aside class="studio-stage">
-        <div class="stage-badge">100% 原始无损尺寸 · 演播室人景融合区</div>
-        
-        <div class="stage-pedestal">
-          <div class="pedestal-ring" id="pedestal-ring"></div>
-          <img src="assets/动作0 · 双手交叠.png" alt="主讲人立牌" class="stage-presenter-photo" id="stage-avatar">
-        </div>
-
-        <div class="stage-desc">
-          右侧专属融合演播台<br>
-          保留完整左屏细节，杜绝内容缩小看不清
-        </div>
-      </aside>
-
-    </main>
-  </div>
+  </main>
 
   <script>
-    // GSAP 工业级精确时间轴配置 (严格 10.4 秒)
-    const tl = gsap.timeline({ paused: true });
+    function switchAct(act) {
+      // 切换按钮状态
+      for (let i = 1; i <= 3; i++) {
+        const btn = document.getElementById('btn-act' + i);
+        const view = document.getElementById('view-act' + i);
+        if (btn) btn.classList.toggle('active', i === act);
+        if (view) view.classList.toggle('active', i === act);
+      }
 
-    // === 第一幕：破局抛出 (0.0s - 3.2s) ===
-    tl.to('#underline-act1', { scaleX: 1, duration: 0.6, ease: 'power2.out' }, 0.2)
-      .to('#pain-item-1', { opacity: 1, x: 0, duration: 0.4 }, 0.6)
-      .to('#pain-item-2', { opacity: 1, x: 0, duration: 0.4 }, 0.9)
-      .to('#pain-item-3', { opacity: 1, x: 0, duration: 0.4 }, 1.2)
-      .to('#hangup-icon', { rotation: -12, repeat: 7, yoyo: true, duration: 0.1, ease: 'sine.inOut' }, 1.0)
-      .to('#pedestal-ring', { scale: 1.04, repeat: 2, yoyo: true, duration: 1.0, ease: 'sine.inOut' }, 0.5);
-
-    // === 第一幕转第二幕 (3.1s - 3.4s) ===
-    tl.to('#view-act1', { opacity: 0, y: -20, duration: 0.3, ease: 'power2.in' }, 3.1)
-      .call(() => {
-        document.getElementById('btn-act1').classList.remove('active');
-        document.getElementById('btn-act2').classList.add('active');
-        document.getElementById('stage-avatar').src = 'assets/动作4 · 食指朝上顿悟.png';
-      }, null, 3.2)
-      .to('#view-act2', { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 3.3)
-
-    // === 第二幕：核心对练 (3.4s - 7.5s) ===
-      .to('#underline-act2', { scaleX: 1, duration: 0.6, ease: 'power2.out' }, 3.5)
-      .fromTo('#map-card', { scale: 0.95, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(1.4)' }, 3.6)
-      .fromTo('#dialogue-card', { scale: 0.95, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(1.4)' }, 4.0)
-      .fromTo('#insight-sticker', { scale: 0, rotation: -20 }, { scale: 1, rotation: 4, duration: 0.6, ease: 'elastic.out(1, 0.6)' }, 4.8);
-
-    // === 第二幕转第三幕 (7.4s - 7.7s) ===
-    tl.to('#view-act2', { opacity: 0, y: -20, duration: 0.3, ease: 'power2.in' }, 7.4)
-      .call(() => {
-        document.getElementById('btn-act2').classList.remove('active');
-        document.getElementById('btn-act3').classList.add('active');
-        document.getElementById('stage-avatar').src = 'assets/贴纸_点赞.png';
-      }, null, 7.5)
-      .to('#view-act3', { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 7.6)
-
-    // === 第三幕：深度体检与成效 (7.7s - 10.4s) ===
-      .to('#underline-act3', { scaleX: 1, duration: 0.6, ease: 'power2.out' }, 7.8)
-      .fromTo('#report-card', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }, 7.9)
-      .fromTo('#stamp-img', 
-        { scale: 2.8, opacity: 0, rotation: 25 }, 
-        { scale: 1, opacity: 1, rotation: -12, duration: 0.4, ease: 'back.out(2.2)' }, 8.4)
-      .fromTo('#outcome-card', { x: 30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }, 8.6)
-      .fromTo('#final-score', { scale: 1.5, color: '#f59e0b' }, { scale: 1, color: '#16a34a', duration: 0.4 }, 9.2);
-
-    // 终止占位保持 (确保恰好达到 10.4s)
-    tl.to({}, { duration: 0.01 }, 10.4);
-
-    // HyperFrames 运行时注册契约
-    window.__timelines = {
-      main: tl
-    };
+      // 右侧立牌随幕次联动
+      const avatar = document.getElementById('stage-avatar');
+      if (avatar) {
+        if (act === 1) avatar.src = '../assets/ai_coach/动作0 · 双手交叠.png';
+        else if (act === 2) avatar.src = '../assets/ai_coach/动作4 · 食指朝上顿悟.png';
+        else avatar.src = '../assets/ai_coach/贴纸_点赞.png';
+      }
+    }
   </script>
 </body>
 </html>
