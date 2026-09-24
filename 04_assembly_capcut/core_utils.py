@@ -189,6 +189,134 @@ def ensure_ring_and_mask(bubble_size: int = 440, theme: str = "ink-wash"):
     return mask_3ch, ring_rgb_bgr, ring_alpha_3ch
 
 
+def ensure_rounded_rect_window_assets(width: int = 560, height: int = 740, radius: int = 22, theme: str = "ai-coach", border_width: int = 2):
+    """
+    Returns (mask_3ch, border_rgb_bgr, border_alpha_3ch).
+    Generates anti-aliased rounded rectangle mask and theme-aware inner/outer border frame.
+    """
+    theme_info = THEME_RING_COLORS.get(theme, THEME_RING_COLORS["ai-coach"])
+    core_rgb = theme_info["core"]
+    glow_rgb = theme_info["glow"]
+
+    # 1. Anti-aliased rounded rectangle mask
+    mask_img = Image.new("L", (width, height), 0)
+    draw_mask = ImageDraw.Draw(mask_img)
+    draw_mask.rounded_rectangle((0, 0, width - 1, height - 1), radius=radius, fill=255)
+    mask_img = mask_img.filter(ImageFilter.GaussianBlur(radius=0.75))
+    mask_arr = np.array(mask_img).astype(np.float32) / 255.0
+    mask_3ch = np.repeat(mask_arr[:, :, np.newaxis], 3, axis=2)
+
+    # 2. Sleek theme border
+    border_img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    draw_border = ImageDraw.Draw(border_img)
+    draw_border.rounded_rectangle(
+        (0, 0, width - 1, height - 1),
+        radius=radius,
+        outline=(glow_rgb[0], glow_rgb[1], glow_rgb[2], 90),
+        width=border_width + 1
+    )
+    draw_border.rounded_rectangle(
+        (1, 1, width - 2, height - 2),
+        radius=radius,
+        outline=(core_rgb[0], core_rgb[1], core_rgb[2], 220),
+        width=border_width
+    )
+    border_arr = np.array(border_img).astype(np.float32)
+    border_rgb_bgr = border_arr[:, :, :3][:, :, ::-1]  # RGB to BGR
+    border_alpha_3ch = np.repeat(border_arr[:, :, 3:4] / 255.0, 3, axis=2)
+
+    return mask_3ch, border_rgb_bgr, border_alpha_3ch
+
+
+def auto_track_face_rect(presenter_path: Path, total_frames: int, fps: float, target_w: int = 560, target_h: int = 740):
+    """
+    Automated Face Tracking for rectangular windows.
+    Calculates the exact (x1, y1, crop_w, crop_h) to crop from the presenter video for each frame,
+    keeping the speaker's face comfortably centered around 33% vertical height (golden eye level).
+    """
+    cap = cv2.VideoCapture(str(presenter_path))
+    fg_w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)) or 544
+    fg_h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) or 960
+
+    target_ratio = target_w / float(target_h)
+    source_ratio = fg_w / float(fg_h)
+
+    if source_ratio < target_ratio:
+        crop_w = fg_w
+        crop_h = int(fg_w / target_ratio)
+    else:
+        crop_h = fg_h
+        crop_w = int(fg_h * target_ratio)
+
+    default_cx = fg_w / 2.0
+    default_cy = fg_h * 0.42
+
+    cascade_loaded = False
+    face_cascade = None
+    if hasattr(cv2, "data") and hasattr(cv2.data, "haarcascades"):
+        cascade_path = os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_default.xml")
+        if os.path.exists(cascade_path) and hasattr(cv2, "CascadeClassifier"):
+            try:
+                face_cascade = cv2.CascadeClassifier(cascade_path)
+                cascade_loaded = True
+            except Exception:
+                cascade_loaded = False
+
+    trajectory = []
+    last_cx, last_cy = default_cx, default_cy
+    step = 5
+    sampled_centers = {}
+
+    frame_idx = 0
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        if frame_idx % step == 0:
+            detected = False
+            if cascade_loaded and face_cascade is not None:
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                faces = face_cascade.detectMultiScale(gray, scaleFactor=1.15, minNeighbors=4, minSize=(100, 100))
+                if len(faces) > 0:
+                    fx, fy, fw, fh = max(faces, key=lambda b: b[2] * b[3])
+                    last_cx = fx + fw / 2.0
+                    last_cy = fy + fh / 2.0
+                    detected = True
+
+            if not detected:
+                ycrcb = cv2.cvtColor(frame[:int(fg_h * 0.8), :], cv2.COLOR_BGR2YCrCb)
+                mask = cv2.inRange(ycrcb, np.array([0, 133, 77]), np.array([255, 173, 127]))
+                cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                if cnts:
+                    valid_cnts = [c for c in cnts if cv2.contourArea(c) > 5000]
+                    if valid_cnts:
+                        c = max(valid_cnts, key=cv2.contourArea)
+                        x, y, w, h = cv2.boundingRect(c)
+                        last_cx = x + w / 2.0
+                        last_cy = y + h / 2.0
+
+            sampled_centers[frame_idx] = (last_cx, last_cy)
+        frame_idx += 1
+
+    cap.release()
+
+    ema_cx, ema_cy = default_cx, default_cy
+    alpha = 0.18
+
+    for i in range(total_frames):
+        sample_key = (i // step) * step
+        target_cx, target_cy = sampled_centers.get(sample_key, (last_cx, last_cy))
+        ema_cx = alpha * target_cx + (1.0 - alpha) * ema_cx
+        ema_cy = alpha * target_cy + (1.0 - alpha) * ema_cy
+
+        clamp_x = max(0, min(fg_w - crop_w, int(ema_cx - crop_w / 2.0)))
+        clamp_y = max(0, min(fg_h - crop_h, int(ema_cy - 0.33 * crop_h)))
+        trajectory.append((clamp_x, clamp_y, crop_w, crop_h))
+
+    return trajectory
+
+
+
 def auto_track_face(presenter_path: Path, total_frames: int, fps: float, crop_size: int = 490):
     """
     Automated Face Tracking & Re-centering Engine.

@@ -148,18 +148,6 @@ def assemble_method_split(root_dir: Path, broll_path: Path, presenter_path: Path
 
     is_vertical = (ratio == "9:16")
     canvas_w, canvas_h = (1080, 1920) if is_vertical else (1920, 1080)
-    bubble_size = 380
-    crop_size = 490
-
-    if is_vertical:
-        bx = (canvas_w - bubble_size) // 2
-        by = canvas_h - bubble_size - 180
-    else:
-        # Perfectly over the right-hand Stage Pedestal (Act 3 layout)
-        bx = 1260
-        by = 470
-
-    mask_3ch, ring_rgb_bgr, ring_alpha_3ch = core_utils.ensure_ring_and_mask(bubble_size, theme=theme)
 
     cap_bg = cv2.VideoCapture(str(broll_path))
     cap_fg = cv2.VideoCapture(str(presenter_path))
@@ -168,8 +156,21 @@ def assemble_method_split(root_dir: Path, broll_path: Path, presenter_path: Path
     total_frames = int(cap_bg.get(cv2.CAP_PROP_FRAME_COUNT)) or 300
     temp_video = root_dir / "output" / f"temp_stage_{ratio.replace(':', '_')}.mp4"
 
-    # Automated Face Tracking
-    trajectory = core_utils.auto_track_face(presenter_path, total_frames, fps, crop_size=crop_size)
+    if is_vertical:
+        bubble_size = 380
+        crop_size = 490
+        bx = (canvas_w - bubble_size) // 2
+        by = canvas_h - bubble_size - 180
+        mask_3ch, ring_rgb_bgr, ring_alpha_3ch = core_utils.ensure_ring_and_mask(bubble_size, theme=theme)
+        trajectory = core_utils.auto_track_face(presenter_path, total_frames, fps, crop_size=crop_size)
+    else:
+        # 16:9 Studio Window Perfect Fit: 560x740 rounded window at x:1270, y:221
+        bw, bh = 560, 740
+        bx = 1270
+        by = 221
+        radius = 22
+        mask_3ch, border_rgb_bgr, border_alpha_3ch = core_utils.ensure_rounded_rect_window_assets(bw, bh, radius=radius, theme=theme)
+        trajectory = core_utils.auto_track_face_rect(presenter_path, total_frames, fps, target_w=bw, target_h=bh)
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     writer = cv2.VideoWriter(str(temp_video), fourcc, fps, (canvas_w, canvas_h))
@@ -191,17 +192,28 @@ def assemble_method_split(root_dir: Path, broll_path: Path, presenter_path: Path
         if frame_bg.shape[1] != canvas_w or frame_bg.shape[0] != canvas_h:
             frame_bg = cv2.resize(frame_bg, (canvas_w, canvas_h), interpolation=cv2.INTER_LANCZOS4)
 
-        # Crop using tracked trajectory
-        x1, y1 = trajectory[min(frame_idx, len(trajectory) - 1)]
-        crop = frame_fg[y1:y1 + crop_size, x1:x1 + crop_size]
-        crop_resized = cv2.resize(crop, (bubble_size, bubble_size), interpolation=cv2.INTER_LANCZOS4)
+        if is_vertical:
+            x1, y1 = trajectory[min(frame_idx, len(trajectory) - 1)]
+            crop = frame_fg[y1:y1 + crop_size, x1:x1 + crop_size]
+            crop_resized = cv2.resize(crop, (bubble_size, bubble_size), interpolation=cv2.INTER_LANCZOS4)
 
-        roi = frame_bg[by:by + bubble_size, bx:bx + bubble_size].astype(np.float32)
-        crop_float = crop_resized.astype(np.float32)
+            roi = frame_bg[by:by + bubble_size, bx:bx + bubble_size].astype(np.float32)
+            crop_float = crop_resized.astype(np.float32)
 
-        blended = roi * (1.0 - mask_3ch) + crop_float * mask_3ch
-        final_bubble = blended * (1.0 - ring_alpha_3ch) + ring_rgb_bgr * ring_alpha_3ch
-        frame_bg[by:by + bubble_size, bx:bx + bubble_size] = np.clip(final_bubble, 0, 255).astype(np.uint8)
+            blended = roi * (1.0 - mask_3ch) + crop_float * mask_3ch
+            final_bubble = blended * (1.0 - ring_alpha_3ch) + ring_rgb_bgr * ring_alpha_3ch
+            frame_bg[by:by + bubble_size, bx:bx + bubble_size] = np.clip(final_bubble, 0, 255).astype(np.uint8)
+        else:
+            x1, y1, cw, ch = trajectory[min(frame_idx, len(trajectory) - 1)]
+            crop = frame_fg[y1:y1 + ch, x1:x1 + cw]
+            crop_resized = cv2.resize(crop, (bw, bh), interpolation=cv2.INTER_LANCZOS4)
+
+            roi = frame_bg[by:by + bh, bx:bx + bw].astype(np.float32)
+            crop_float = crop_resized.astype(np.float32)
+
+            blended = roi * (1.0 - mask_3ch) + crop_float * mask_3ch
+            final_box = blended * (1.0 - border_alpha_3ch) + border_rgb_bgr * border_alpha_3ch
+            frame_bg[by:by + bh, bx:bx + bw] = np.clip(final_box, 0, 255).astype(np.uint8)
 
         writer.write(frame_bg)
 
@@ -259,13 +271,13 @@ def assemble_method_dynamic(root_dir: Path, broll_path: Path, presenter_path: Pa
         print(f"❌ FFmpeg Error in Shot 1: {proc1.stderr}")
         raise RuntimeError("Shot 1 failed.")
 
-    # Shot 2 (2.5 ~ 7.5s): Face Bubble Cutaway
-    shot2_full = root_dir / "output" / f"temp_bubble_full_{ratio.replace(':', '_')}.mp4"
-    assemble_method_bubble(root_dir, broll_path, presenter_path, audio_path, shot2_full, ratio=ratio, theme=theme)
+    # Shot 2 (2.0 ~ 7.5s): Studio Window Fusion (NO circular bubble!)
+    shot2_full = root_dir / "output" / f"temp_stage_full_{ratio.replace(':', '_')}.mp4"
+    assemble_method_split(root_dir, broll_path, presenter_path, audio_path, shot2_full, ratio=ratio, theme=theme)
 
     cmd2 = [
         "ffmpeg", "-y",
-        "-ss", "2.5", "-t", "5.0", "-i", str(shot2_full),
+        "-ss", "2.0", "-t", "5.5", "-i", str(shot2_full),
         "-c:v", "libx264", "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p", "-r", "30",
         "-an", str(shot2_out)
     ]
@@ -274,13 +286,10 @@ def assemble_method_dynamic(root_dir: Path, broll_path: Path, presenter_path: Pa
         print(f"❌ FFmpeg Error in Shot 2: {proc2.stderr}")
         raise RuntimeError("Shot 2 failed.")
 
-    # Shot 3 (7.5 ~ 10.0s): Split Screen Finish
-    shot3_full = root_dir / "output" / f"temp_split_full_{ratio.replace(':', '_')}.mp4"
-    assemble_method_split(root_dir, broll_path, presenter_path, audio_path, shot3_full, ratio=ratio, theme=theme)
-
+    # Shot 3 (7.5 ~ 10.0s): Stage Window Finish
     cmd3 = [
         "ffmpeg", "-y",
-        "-ss", "7.5", "-t", "2.5", "-i", str(shot3_full),
+        "-ss", "7.5", "-t", "2.5", "-i", str(shot2_full),
         "-c:v", "libx264", "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p", "-r", "30",
         "-an", str(shot3_out)
     ]
@@ -311,7 +320,7 @@ def assemble_method_dynamic(root_dir: Path, broll_path: Path, presenter_path: Pa
         raise RuntimeError("FFmpeg concatenate failed.")
 
     # Cleanup temporary files
-    for tmp in [shot1_out, shot2_out, shot3_out, shot2_full, shot3_full, concat_txt]:
+    for tmp in [shot1_out, shot2_out, shot3_out, shot2_full, concat_txt]:
         safe_unlink(tmp)
 
     print(f"✅ Method 3 Complete! Output saved to: {output_path}")
@@ -378,16 +387,17 @@ def build_chatcut_desktop_draft(project_name: str, method: str, a_roll_path: Pat
             "segments": [{"material_id": pres_mat_id, "target_timerange": {"start": 0, "duration": 10000000}, "source_timerange": {"start": 0, "duration": 10000000}, "render_index": 1,
                           "clip": {"alpha": 1.0, "scale": {"x": 0.45, "y": 0.45}, "transform": {"x": 0.38, "y": -0.32}}}]
         })
-    else:  # split / stack
+    else:  # split / dynamic: 100% full scale B-roll + presenter fitted in right window
         tracks.append({
             "id": str(uuid.uuid4()).upper(), "type": "video",
             "segments": [{"material_id": broll_mat_id, "target_timerange": {"start": 0, "duration": 10000000}, "source_timerange": {"start": 0, "duration": 10000000}, "render_index": 0,
-                          "clip": {"scale": {"x": 0.625, "y": 0.625}, "transform": {"x": -0.25 if not is_vertical else 0.0, "y": 0.0 if not is_vertical else 0.28}}}]
+                          "clip": {"scale": {"x": 1.0, "y": 1.0}, "transform": {"x": 0.0, "y": 0.0}}}]
         })
         tracks.append({
             "id": str(uuid.uuid4()).upper(), "type": "video",
             "segments": [{"material_id": pres_mat_id, "target_timerange": {"start": 0, "duration": 10000000}, "source_timerange": {"start": 0, "duration": 10000000}, "render_index": 1,
-                          "clip": {"scale": {"x": 1.0, "y": 1.0}, "transform": {"x": 0.35 if not is_vertical else 0.0, "y": 0.0 if not is_vertical else -0.28}}}]
+                          "clip": {"scale": {"x": 0.77 if not is_vertical else 1.0, "y": 0.77 if not is_vertical else 1.0},
+                                   "transform": {"x": 0.307 if not is_vertical else 0.0, "y": -0.047 if not is_vertical else -0.28}}}]
         })
 
     draft_content = {

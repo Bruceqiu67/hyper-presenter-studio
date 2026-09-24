@@ -445,7 +445,7 @@
       background: #ffffff;
       border: 2px solid rgba(28, 25, 23, 0.1);
       border-radius: 28px;
-      padding: 30px;
+      padding: 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -456,39 +456,62 @@
       font-size: 14px;
       font-weight: 800;
       letter-spacing: 0.5px;
-      background: #f3f4f6;
-      color: #4b5563;
-      padding: 6px 16px;
+      background: #fef3c7;
+      color: #92400e;
+      padding: 6px 18px;
       border-radius: 20px;
-      border: 1px solid #e5e7eb;
-    }
-    .stage-pedestal {
-      position: relative;
-      width: 440px;
-      height: 600px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
       display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .stage-presenter-window {
+      position: relative;
+      width: 560px;
+      height: 740px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #fdfbf7 0%, #f7f3ea 100%);
+      border: 2px solid rgba(234, 88, 12, 0.25);
+      box-shadow: 0 12px 32px rgba(28, 25, 23, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
     }
-    .pedestal-ring {
+    .camera-live-tag {
       position: absolute;
-      width: 410px;
-      height: 410px;
-      border-radius: 50%;
-      border: 4px solid #f59e0b;
-      box-shadow: 0 0 40px rgba(245, 158, 11, 0.25), inset 0 0 20px rgba(245, 158, 11, 0.15);
+      top: 14px;
+      left: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(28, 25, 23, 0.75);
+      color: #faf7ee;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 12px;
+      backdrop-filter: blur(8px);
+      z-index: 10;
     }
-    .stage-presenter-photo {
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+    }
+    .stage-presenter-standby {
       position: relative;
-      max-height: 580px;
+      max-height: 660px;
       object-fit: contain;
-      z-index: 2;
-      filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.18));
+      filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.12));
     }
     .stage-desc {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
-      color: #9ca3af;
+      color: #78716c;
       text-align: center;
       line-height: 1.4;
     }
@@ -631,16 +654,19 @@
 
       <!-- 右侧演播室舞台融合区 (Stage Pedestal) -->
       <aside class="studio-stage">
-        <div class="stage-badge">100% 原始无损尺寸 · 演播室人景融合区</div>
+        <div class="stage-badge">
+          <span>🎙️</span> 100% 原始无损尺寸 · 演播室人景融合区
+        </div>
         
-        <div class="stage-pedestal">
-          <div class="pedestal-ring" id="pedestal-ring"></div>
-          <img src="assets/动作0 · 双手交叠.png" alt="主讲人立牌" class="stage-presenter-photo" id="stage-avatar">
+        <div class="stage-presenter-window" id="presenter-window">
+          <div class="camera-live-tag">
+            <span class="live-dot"></span> LIVE 主讲人演播席
+          </div>
+          <img src="assets/动作0 · 双手交叠.png" alt="主讲人" class="stage-presenter-standby" id="stage-avatar">
         </div>
 
         <div class="stage-desc">
-          右侧专属融合演播台<br>
-          保留完整左屏细节，杜绝内容缩小看不清
+          右侧专属融合演播台 · 保留完整左屏细节
         </div>
       </aside>
 
@@ -656,8 +682,7 @@
       .to('#pain-item-1', { opacity: 1, x: 0, duration: 0.4 }, 0.6)
       .to('#pain-item-2', { opacity: 1, x: 0, duration: 0.4 }, 0.9)
       .to('#pain-item-3', { opacity: 1, x: 0, duration: 0.4 }, 1.2)
-      .to('#hangup-icon', { rotation: -12, repeat: 7, yoyo: true, duration: 0.1, ease: 'sine.inOut' }, 1.0)
-      .to('#pedestal-ring', { scale: 1.04, repeat: 2, yoyo: true, duration: 1.0, ease: 'sine.inOut' }, 0.5);
+      .to('#hangup-icon', { rotation: -12, repeat: 7, yoyo: true, duration: 0.1, ease: 'sine.inOut' }, 1.0);
 
     // === 第一幕转第二幕 (3.1s - 3.4s) ===
     tl.to('#view-act1', { opacity: 0, y: -20, duration: 0.3, ease: 'power2.in' }, 3.1)

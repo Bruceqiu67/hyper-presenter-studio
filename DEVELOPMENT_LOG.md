@@ -115,6 +115,11 @@
       - `split_presenter_1920x1080.mp4` (Method 2 全画幅无损演播室融合)
       - `face_bubble_optimized_1920x1080.mp4` (Method 1 发光圆框动态居中)
     - 自动在剪映 `root_meta_info.json` 注册工程并置顶；
+  - **右侧演播室融合区窗口无损完美贴合 (User Feedback Iteration)**：
+    - 废除在右侧演播台上叠加圆形气泡框的旧模式；
+    - 依据右侧容器真实 DOM 边界构建 `560×740` (Radius: 22px) 的演播室专属视窗；
+    - 在 `core_utils.py` 中研发 `auto_track_face_rect` 矩形人脸居中追踪算法与 `ensure_rounded_rect_window_assets` 亚像素平滑遮罩；
+    - 人像视频以黄金视平线高宽比无缝嵌入右侧舞台，实现广播级演播室无损融合；
   - **Windows 文件系统鲁棒性加固**：
     - 引入 `safe_unlink` 重试机制，消除并发与 FFmpeg 释放滞后引发的 `PermissionError: [WinError 32]` 异常。
 
