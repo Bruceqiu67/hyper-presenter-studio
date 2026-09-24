@@ -1,0 +1,31 @@
+{
+  "project": "Reasonix CLI",
+  "theme": "cyber-purple",
+  "name": "Cyber Purple (赛博霓虹紫)",
+  "resolution": {
+    "width": 1080,
+    "height": 1920,
+    "ratio": "9:16"
+  },
+  "colors": {
+    "primary": "#c084fc",
+    "secondary": "#f472b6",
+    "accent": "#38bdf8",
+    "window_background": "rgba(23, 14, 43, 0.8)",
+    "window_border": "rgba(192, 132, 252, 0.25)",
+    "text_main": "#faf5ff",
+    "text_dim": "#7e6c9e",
+    "tag_background": "rgba(192, 132, 252, 0.14)",
+    "tag_border": "rgba(192, 132, 252, 0.35)"
+  },
+  "typography": {
+    "font_family_code": "JetBrains Mono, Consolas, monospace",
+    "font_family_heading": "Outfit, -apple-system, sans-serif",
+    "font_size_terminal": "18px"
+  },
+  "layout": {
+    "terminal_width": 920,
+    "terminal_height": 1100,
+    "border_radius": 20
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "hyper-presenter-studio",
+  "version": "1.0.0",
+  "description": "Next-Gen Human-AI Hybrid Video Studio: From OpenDesign Prototypes to HyperFrames Code Motion & CapCut Desktop Assembly.",
+  "main": "index.js",
+  "scripts": {
+    "hyperframes:preview": "hyperframes preview ./02_motion_hyperframes",
+    "hyperframes:check": "hyperframes check ./02_motion_hyperframes",
+    "hyperframes:render": "hyperframes render ./02_motion_hyperframes -o ./output/broll_motion.mp4",
+    "hyperframes:render-overlay": "hyperframes render ./02_motion_hyperframes --format webm -o ./output/broll_overlay.webm",
+    "proto:generate": "python 01_prototype_opendesign/generate_prototype.py --theme all",
+    "proto:generate:vertical": "python 01_prototype_opendesign/generate_prototype.py --ratio 9:16 --theme all",
+    "guide:generate": "python 03_presenter_aroll/generate_shooting_guide.py --ratio all",
+    "edit:propose": "python 04_assembly_capcut/propose_edit_schemes.py --ratio 16:9",
+    "edit:propose:vertical": "python 04_assembly_capcut/propose_edit_schemes.py --ratio 9:16",
+    "edit:propose:all": "python 04_assembly_capcut/propose_edit_schemes.py --ratio all",
+    "assemble": "python 04_assembly_capcut/chatcut_auto_assembly.py --ratio 16:9 --mode all",
+    "assemble:bubble": "python 04_assembly_capcut/chatcut_auto_assembly.py --ratio 16:9 --mode bubble",
+    "assemble:split": "python 04_assembly_capcut/chatcut_auto_assembly.py --ratio 16:9 --mode split",
+    "assemble:dynamic": "python 04_assembly_capcut/chatcut_auto_assembly.py --ratio 16:9 --mode dynamic",
+    "assemble:vertical": "python 04_assembly_capcut/chatcut_auto_assembly.py --ratio 9:16 --mode all",
+    "assemble:vertical:bubble": "python 04_assembly_capcut/chatcut_auto_assembly.py --ratio 9:16 --mode bubble",
+    "assemble:vertical:stack": "python 04_assembly_capcut/chatcut_auto_assembly.py --ratio 9:16 --mode split",
+    "assemble:vertical:dynamic": "python 04_assembly_capcut/chatcut_auto_assembly.py --ratio 9:16 --mode dynamic"
+  },
+  "keywords": [
+    "hyperframes",
+    "opendesign",
+    "capcut",
+    "jianying",
+    "talking-head",
+    "developer-video",
+    "code-motion",
+    "remotion",
+    "mcp"
+  ],
+  "author": "Bruce Qiu",
+  "license": "MIT",
+  "devDependencies": {
+    "hyperframes": "^0.8.70"
+  }
+}

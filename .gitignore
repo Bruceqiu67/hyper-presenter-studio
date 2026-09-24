@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing and Coverage
+coverage/
+.nyc_output/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+
+# HyperFrames and Build Caches
+.hyperframes/
+dist/
+build/
+.cache/
+
+# Large Video, Audio & Render Media (Keep repo lightweight for Git)
+*.mp4
+*.mov
+*.webm
+*.avi
+*.wav
+*.mp3
+*.m4a
+!assets/demo_placeholder.*
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Local Environment Variables & Secrets
+.env
+.env.local
+*.log

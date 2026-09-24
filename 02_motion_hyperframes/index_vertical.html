@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>HyperFrames Code Motion - 9:16 Vertical Mobile</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html, body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #090d16;
+        color: #f8fafc;
+        font-family: 'JetBrains Mono', Consolas, Menlo, Monaco, 'Courier New', monospace;
+      }
+
+      /* Cyber grid background */
+      #root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #090d16 80%);
+        overflow: hidden;
+      }
+
+      /* Ambient glow */
+      .glow-orb {
+        position: absolute;
+        width: 700px;
+        height: 700px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, transparent 70%);
+        filter: blur(50px);
+        pointer-events: none;
+      }
+
+      /* Terminal Card (Vertical 920x1100) */
+      #terminal-card {
+        width: 920px;
+        height: 1100px;
+        background: rgba(15, 23, 42, 0.94);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: 20px;
+        box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8), 0 0 50px rgba(56, 189, 248, 0.16);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        backdrop-filter: blur(24px);
+        transform-origin: center center;
+        z-index: 10;
+      }
+
+      /* Terminal Header */
+      .terminal-header {
+        height: 56px;
+        background: rgba(30, 41, 59, 0.8);
+        border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+        display: flex;
+        align-items: center;
+        padding: 0 24px;
+        position: relative;
+      }
+
+      .traffic-lights {
+        display: flex;
+        gap: 10px;
+      }
+
+      .traffic-light {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+      }
+      .light-red { background: #ef4444; }
+      .light-yellow { background: #f59e0b; }
+      .light-green { background: #10b981; }
+
+      .terminal-title {
+        position: absolute;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 15px;
+        color: #94a3b8;
+        letter-spacing: 0.05em;
+      }
+
+      /* Terminal Body */
+      .terminal-body {
+        flex: 1;
+        padding: 40px 44px;
+        font-size: 21px;
+        line-height: 1.8;
+        color: #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .prompt-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 10px;
+        word-break: break-all;
+      }
+
+      .prompt-prefix {
+        color: #38bdf8;
+        font-weight: 600;
+      }
+
+      .prompt-cmd {
+        color: #ffffff;
+        font-weight: 500;
+      }
+
+      .caret {
+        display: inline-block;
+        width: 11px;
+        height: 24px;
+        background: #38bdf8;
+        vertical-align: middle;
+        animation: blink 0.8s step-start infinite;
+      }
+
+      @keyframes blink {
+        50% { opacity: 0; }
+      }
+
+      .log-line {
+        color: #94a3b8;
+        margin-left: 24px;
+        margin-bottom: 8px;
+        font-size: 19px;
+      }
+
+      .success-line {
+        color: #34d399;
+        font-weight: 600;
+        margin-left: 24px;
+        margin-bottom: 20px;
+        font-size: 19px;
+      }
+
+      /* Progress bar container */
+      .progress-container {
+        width: 440px;
+        max-width: 100%;
+        height: 10px;
+        background: rgba(51, 65, 85, 0.6);
+        border-radius: 6px;
+        margin: 12px 0 16px 24px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #38bdf8, #818cf8);
+        border-radius: 6px;
+      }
+
+      .badge-tag {
+        display: inline-block;
+        padding: 4px 12px;
+        background: rgba(56, 189, 248, 0.15);
+        color: #38bdf8;
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-left: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main_vertical"
+      data-start="0"
+      data-duration="10"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div class="glow-orb" id="glow"></div>
+
+      <!-- Main Floating Terminal Card -->
+      <div id="terminal-card" class="clip" data-start="0" data-duration="10" data-track-index="0">
+        <div class="terminal-header">
+          <div class="traffic-lights">
+            <div class="traffic-light light-red"></div>
+            <div class="traffic-light light-yellow"></div>
+            <div class="traffic-light light-green"></div>
+          </div>
+          <div class="terminal-title">bash — user@reasonix-core: ~ — 920×1100</div>
+        </div>
+
+        <div class="terminal-body">
+          <!-- Step 1: Install Command -->
+          <div class="prompt-row" id="row-1">
+            <span class="prompt-prefix">❯</span>
+            <span class="prompt-cmd" id="cmd-1"></span>
+            <span class="caret" id="caret-1"></span>
+          </div>
+
+          <!-- Step 2: Downloading & Progress -->
+          <div id="logs-step-1">
+            <div class="log-line">fetching packages [····················] resolve 148 dependencies</div>
+            <div class="progress-container">
+              <div class="progress-fill" id="bar-fill"></div>
+            </div>
+            <div class="success-line" id="success-1">
+              ✔ Installed reasonix@latest (v2.4.0) in 1.82s
+              <span class="badge-tag">Zero Config</span>
+            </div>
+          </div>
+
+          <!-- Step 3: Run / Init Command -->
+          <div class="prompt-row" id="row-2">
+            <span class="prompt-prefix">❯</span>
+            <span class="prompt-cmd" id="cmd-2"></span>
+            <span class="caret" id="caret-2"></span>
+          </div>
+
+          <!-- Step 4: CoT Output -->
+          <div id="logs-step-2">
+            <div class="log-line">→ Loading local model context... <span style="color: #38bdf8;">OK</span></div>
+            <div class="log-line">→ Decomposing problem into 4 sub-agents: [Analyzer, Designer, Coder, Reviewer]</div>
+            <div class="success-line" style="color: #818cf8;">
+              ⚡ Reasoning Pipeline Initialized. Ready for streaming.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      const cmd1Text = "npm install -g reasonix";
+      const cmd1El = document.getElementById("cmd-1");
+      const cmd2Text = 'reasonix run "Analyze tech architecture"';
+      const cmd2El = document.getElementById("cmd-2");
+
+      // Initial state
+      gsap.set("#terminal-card", { opacity: 0, scale: 0.94, y: 40 });
+      gsap.set("#row-1", { opacity: 0 });
+      gsap.set("#logs-step-1", { opacity: 0, y: 10 });
+      gsap.set("#bar-fill", { width: "0%" });
+      gsap.set("#row-2", { opacity: 0, y: 10 });
+      gsap.set("#logs-step-2", { opacity: 0, y: 10 });
+
+      // Animation Sequence (0s - 10s)
+      // 1. Terminal Card Enters (0.0s - 0.8s)
+      tl.to("#terminal-card", { opacity: 1, scale: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.2);
+      tl.to("#row-1", { opacity: 1, duration: 0.2 }, 0.8);
+
+      // Typewriter effect for Command 1 (0.8s - 1.5s)
+      const typeObj1 = { len: 0 };
+      tl.to(typeObj1, {
+        len: cmd1Text.length,
+        duration: 0.7,
+        ease: "none",
+        onUpdate: () => {
+          cmd1El.textContent = cmd1Text.substring(0, Math.round(typeObj1.len));
+        }
+      }, 0.8);
+
+      // 2. Install command triggered, progress bar fills (1.5s - 3.2s)
+      tl.to("#caret-1", { opacity: 0, duration: 0.1 }, 1.5);
+      tl.to("#logs-step-1", { opacity: 1, y: 0, duration: 0.4 }, 1.7);
+      tl.to("#bar-fill", { width: "100%", duration: 1.2, ease: "power2.inOut" }, 1.9);
+
+      // 3. Camera micro-zoom on success (3.2s - 4.5s)
+      tl.to("#terminal-card", { scale: 1.02, duration: 0.8, ease: "power2.out" }, 3.2);
+
+      // 4. Step 2 Command: reasonix run with typewriter (4.5s - 5.5s)
+      tl.to("#row-2", { opacity: 1, y: 0, duration: 0.2 }, 4.4);
+      const typeObj2 = { len: 0 };
+      tl.to(typeObj2, {
+        len: cmd2Text.length,
+        duration: 0.9,
+        ease: "none",
+        onUpdate: () => {
+          cmd2El.textContent = cmd2Text.substring(0, Math.round(typeObj2.len));
+        }
+      }, 4.5);
+
+      tl.to("#caret-2", { opacity: 0, duration: 0.1 }, 5.4);
+      tl.to("#logs-step-2", { opacity: 1, y: 0, duration: 0.5 }, 5.5);
+
+      // 5. Outro hold and settle (6.5s - 10.0s)
+      tl.to("#glow", { scale: 1.2, opacity: 0.8, duration: 3, ease: "sine.inOut" }, 6.0);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main_vertical"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

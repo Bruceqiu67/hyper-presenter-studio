@@ -1,0 +1,31 @@
+{
+  "project": "Reasonix CLI",
+  "theme": "cyber-dark",
+  "name": "Cyber Dark (赛博青暗黑极客风)",
+  "resolution": {
+    "width": 1920,
+    "height": 1080,
+    "ratio": "16:9"
+  },
+  "colors": {
+    "primary": "#38bdf8",
+    "secondary": "#818cf8",
+    "accent": "#34d399",
+    "window_background": "rgba(13, 20, 36, 0.78)",
+    "window_border": "rgba(56, 189, 248, 0.22)",
+    "text_main": "#f8fafc",
+    "text_dim": "#64748b",
+    "tag_background": "rgba(56, 189, 248, 0.14)",
+    "tag_border": "rgba(56, 189, 248, 0.35)"
+  },
+  "typography": {
+    "font_family_code": "JetBrains Mono, Consolas, monospace",
+    "font_family_heading": "Outfit, -apple-system, sans-serif",
+    "font_size_terminal": "20px"
+  },
+  "layout": {
+    "terminal_width": 1280,
+    "terminal_height": 720,
+    "border_radius": 20
+  }
+}
