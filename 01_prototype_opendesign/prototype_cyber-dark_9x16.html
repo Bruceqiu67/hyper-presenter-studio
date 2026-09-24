@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1080, height=1920, initial-scale=1.0">
-  <title>OpenDesign Prototype - Reasonix CLI [9:16]</title>
+  <title>OpenDesign Prototype - HyperPresenter Studio [9:16]</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
@@ -70,6 +70,7 @@
       color: #38bdf8;
       box-shadow: 0 0 20px rgba(56, 189, 248, 0.14);
     }
+
     .headline {
       font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
       font-size: 34px;
@@ -85,8 +86,7 @@
     .terminal-window {
       width: 920px;
       height: 1100px;
-      background: rgba(13, 20, 36, 0.78);
-      border: 1px solid rgba(56, 189, 248, 0.22);
+      border: 1px solid rgba(56, 189, 248, 0.22); background: rgba(13, 20, 36, 0.78);
       border-radius: 20px;
       box-shadow: 0 24px 70px rgba(56, 189, 248, 0.16);
       backdrop-filter: blur(24px);
@@ -217,7 +217,7 @@
   <div class="stage-container">
     <div class="header-bar">
       <div class="badge">OpenDesign Prototype [9:16]</div>
-      <div class="headline">Reasonix CLI</div>
+      <div class="headline">HyperPresenter Studio</div>
     </div>
 
     <div class="terminal-window">
@@ -233,28 +233,38 @@
       <div class="terminal-body">
         <div class="cmd-line">
           <span class="prompt">❯</span>
-          <span class="command-text">npm install -g reasonix &amp;&amp; reasonix run</span>
+          <span class="command-text">npx hyper-presenter setup --preset prismatic-aurora</span>
           <span class="cursor"></span>
         </div>
 
-        <div class="info-line">fetching packages [····················] resolve 148 dependencies</div>
-        <div class="progress-box">
-          <div class="progress-bar"></div>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+            <span style="font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: rgba(192,132,252,0.2); color: #c084fc; border: 1px solid rgba(192,132,252,0.4);">Phase 1</span>
+            <span style="flex: 1; font-size: 15px; color: #e2e8f0;">OpenDesign: AI 动态生成高保真极光 UI 原型与 Design Tokens</span>
+            <span style="color: #06d6a0; font-weight: 600; font-size: 14px;">✔ Verified</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+            <span style="font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: rgba(56,189,248,0.2); color: #38bdf8; border: 1px solid rgba(56,189,248,0.4);">Phase 2</span>
+            <span style="flex: 1; font-size: 15px; color: #e2e8f0;">HyperFrames: 纯代码无损编译 1080P 60fps 极客动效 B-Roll</span>
+            <span style="color: #06d6a0; font-weight: 600; font-size: 14px;">✔ 100% 60fps</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+            <span style="font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: rgba(251,191,36,0.2); color: #fbbf24; border: 1px solid rgba(251,191,36,0.4);">Phase 3</span>
+            <span style="flex: 1; font-size: 15px; color: #e2e8f0;">Script Master: 10s 秒级分镜卡点蓝图、手势与眼神视线指引</span>
+            <span style="color: #06d6a0; font-weight: 600; font-size: 14px;">✔ Generated</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+            <span style="font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: rgba(6,214,160,0.2); color: #06d6a0; border: 1px solid rgba(6,214,160,0.4);">Phase 4</span>
+            <span style="flex: 1; font-size: 15px; color: #e2e8f0;">ChatCut Engine: OpenCV 实时人脸追踪重定帧 + 剪映草稿置顶注册</span>
+            <span style="color: #06d6a0; font-weight: 600; font-size: 14px;">✔ Ready</span>
+          </div>
         </div>
-
-        <div class="status-line">
-          <span>✔</span>
-          <span>reasonix cli ready</span>
-          <span class="highlight-badge">Zero Configuration</span>
+        <div style="margin-top: 10px; padding: 10px 16px; background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(244,114,182,0.15)); border: 1px solid rgba(244,114,182,0.4); border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 15px; font-weight: 700; color: #ffffff;">🚀 100% 工业化人机协同全流程就绪 · 零人工手动拖拽剪辑</span>
+          <span style="font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 9999px; background: #06d6a0; color: #05030a;">PIPELINE ACTIVE</span>
         </div>
-
-        <div class="info-line" style="margin-top: 10px;">
-          → Decomposing problem into 4 sub-agents: [Analyzer, Designer, Coder, Reviewer]
-        </div>
-        <div class="status-line" style="color: #38bdf8;">
-          <span>⚡</span>
-          <span>Pipeline Initialized. Ready for streaming.</span>
-        </div>
+    
       </div>
     </div>
   </div>

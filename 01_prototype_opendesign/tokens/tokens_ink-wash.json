@@ -1,0 +1,36 @@
+{
+  "theme": "ink-wash",
+  "name": "Ink Wash (现代新中式宣白水墨风)",
+  "color": {
+    "canvas_bg": "#fbfbfa",
+    "paper_tone": "#f5f4ef",
+    "ink_black": "#18181b",
+    "ink_dark": "#27272a",
+    "ink_medium": "#52525b",
+    "ink_light": "#a1a1aa",
+    "vermilion_red": "#dc2626",
+    "vermilion_dark": "#991b1b",
+    "vermilion_bg": "rgba(220, 38, 38, 0.08)",
+    "vermilion_border": "rgba(220, 38, 38, 0.3)",
+    "jade_cyan": "#0d9488",
+    "sky_blue": "#0284c7",
+    "card_bg": "rgba(255, 255, 255, 0.94)",
+    "card_border": "rgba(24, 24, 27, 0.12)",
+    "card_shadow": "0 20px 50px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04)"
+  },
+  "typography": {
+    "font_family_main": "'Outfit', 'PingFang SC', 'Noto Serif SC', -apple-system, sans-serif",
+    "font_family_mono": "'JetBrains Mono', Consolas, Monaco, monospace",
+    "title_size": "56px",
+    "headline_size": "44px",
+    "card_title_size": "32px",
+    "body_size": "22px",
+    "badge_size": "16px"
+  },
+  "layout": {
+    "aspect_ratio": "16:9",
+    "width": 1920,
+    "height": 1080,
+    "border_radius": "20px"
+  }
+}

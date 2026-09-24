@@ -21,7 +21,15 @@
     "assemble:vertical": "python 04_assembly_capcut/chatcut_auto_assembly.py --ratio 9:16 --mode all",
     "assemble:vertical:bubble": "python 04_assembly_capcut/chatcut_auto_assembly.py --ratio 9:16 --mode bubble",
     "assemble:vertical:stack": "python 04_assembly_capcut/chatcut_auto_assembly.py --ratio 9:16 --mode split",
-    "assemble:vertical:dynamic": "python 04_assembly_capcut/chatcut_auto_assembly.py --ratio 9:16 --mode dynamic"
+    "assemble:vertical:dynamic": "python 04_assembly_capcut/chatcut_auto_assembly.py --ratio 9:16 --mode dynamic",
+    "pipeline:status": "python run_pipeline.py --status",
+    "pipeline:step1": "python run_pipeline.py --step 1",
+    "pipeline:capture": "node scripts/capture_demo_shots.js",
+    "pipeline:step2": "python run_pipeline.py --step 2",
+    "pipeline:step3": "python run_pipeline.py --step 3",
+    "pipeline:step4": "python run_pipeline.py --step 4",
+    "pipeline:all": "python run_pipeline.py --all",
+    "pipeline:demo": "python run_pipeline.py --restore-demo"
   },
   "keywords": [
     "hyperframes",

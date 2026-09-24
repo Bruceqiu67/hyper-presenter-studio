@@ -98,7 +98,10 @@ def generate_scheme_previews(root_dir: Path, broll_path: Path, presenter_path: P
         final_bubble = blended * (1.0 - ring_alpha_3ch) + ring_rgb_bgr * ring_alpha_3ch
         frame_bg_bubble[by:by + bubble_size, bx:bx + bubble_size] = np.clip(final_bubble, 0, 255).astype(np.uint8)
 
-        cv2.imwrite(str(p1), frame_bg_bubble)
+        is_success, buffer = cv2.imencode(".jpg", frame_bg_bubble)
+        if is_success:
+            with open(str(p1), "wb") as f:
+                f.write(buffer)
     else:
         # Fallback via ffmpeg
         subprocess.run(["ffmpeg", "-y", "-ss", "3.0", "-i", str(broll_path), "-vframes", "1", str(p1)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -140,7 +143,7 @@ def generate_scheme_previews(root_dir: Path, broll_path: Path, presenter_path: P
     cmd3 = [
         "ffmpeg", "-y",
         "-ss", "1.5", "-i", str(presenter_path),
-        "-vf", f"scale=-1:{canvas_h},crop={canvas_w}:{canvas_h}",
+        "-vf", f"scale=w={canvas_w}:h={canvas_h}:force_original_aspect_ratio=decrease,pad={canvas_w}:{canvas_h}:(ow-iw)/2:(oh-ih)/2:color=0x0a0e17",
         "-vframes", "1",
         str(p3)
     ]

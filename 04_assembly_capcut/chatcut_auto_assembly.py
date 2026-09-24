@@ -30,13 +30,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import core_utils
 
 
-def assemble_method_bubble(root_dir: Path, broll_path: Path, presenter_path: Path, audio_path: Path, output_path: Path, ratio: str = "16:9"):
+def assemble_method_bubble(root_dir: Path, broll_path: Path, presenter_path: Path, audio_path: Path, output_path: Path, ratio: str = "16:9", theme: str = "ink-wash"):
     """
     Method 1: Dynamic Centered Face Bubble.
     Supports both 16:9 (1920x1080) and 9:16 (1080x1920) canvases.
     Automated face tracking with EMA smoothing and freeze-frame hold.
     """
-    print(f"\n🚀 [ChatCut Engine] Executing Method 1: Face Bubble (发光圆框动态居中) [{ratio}]")
+    print(f"\n🚀 [ChatCut Engine] Executing Method 1: Face Bubble (发光圆框动态居中) [{ratio}] (Theme: {theme})")
 
     is_vertical = (ratio == "9:16")
     canvas_w, canvas_h = (1080, 1920) if is_vertical else (1920, 1080)
@@ -53,7 +53,7 @@ def assemble_method_bubble(root_dir: Path, broll_path: Path, presenter_path: Pat
         bx = canvas_w - bubble_size - 60  # 1420
         by = canvas_h - bubble_size - 60  # 580
 
-    mask_3ch, ring_rgb_bgr, ring_alpha_3ch = core_utils.ensure_ring_and_mask(bubble_size)
+    mask_3ch, ring_rgb_bgr, ring_alpha_3ch = core_utils.ensure_ring_and_mask(bubble_size, theme=theme)
 
     cap_bg = cv2.VideoCapture(str(broll_path))
     cap_fg = cv2.VideoCapture(str(presenter_path))
@@ -126,43 +126,83 @@ def assemble_method_bubble(root_dir: Path, broll_path: Path, presenter_path: Pat
     print(f"✅ Method 1 Complete! Output saved to: {output_path}")
 
 
-def assemble_method_split(root_dir: Path, broll_path: Path, presenter_path: Path, audio_path: Path, output_path: Path, ratio: str = "16:9"):
+def assemble_method_split(root_dir: Path, broll_path: Path, presenter_path: Path, audio_path: Path, output_path: Path, ratio: str = "16:9", theme: str = "ink-wash"):
     """
-    Method 2: Side-by-Side (16:9) or Golden Stack (9:16 Vertical).
+    Method 2: Full-Canvas Studio Stage Fusion (全屏无损演播室人景融合).
+    Keeps B-roll at 100% full scale (1920x1080 or 1080x1920).
+    Seamlessly integrates presenter on the dedicated stage pedestal with glowing aurora ring.
+    Zero downscaling, zero fragmentation.
     """
-    print(f"\n🚀 [ChatCut Engine] Executing Method 2: Tech Split / Stack [{ratio}]")
+    print(f"\n🚀 [ChatCut Engine] Executing Method 2: Full-Canvas Studio Stage Fusion [{ratio}] (Theme: {theme})")
 
     is_vertical = (ratio == "9:16")
+    canvas_w, canvas_h = (1080, 1920) if is_vertical else (1920, 1080)
+    bubble_size = 380
+    crop_size = 490
 
     if is_vertical:
-        # Vertical 9:16 (1080x1920) Social Stack:
-        # Upper: 1000x562 B-roll floating in upper screen
-        # Lower: 1080x1000 Presenter grounded in lower screen
-        filter_complex = (
-            "[0:v]scale=1000:562:flags=lanczos[broll];"
-            "[1:v]scale=1080:1080:flags=lanczos[pres];"
-            "color=c=0x07090e:s=1080x1920:d=10[bg];"
-            "[bg][broll]overlay=40:220[bg1];"
-            "[bg1][pres]overlay=0:840[v]"
-        )
+        bx = (canvas_w - bubble_size) // 2
+        by = canvas_h - bubble_size - 180
     else:
-        # Horizontal 16:9 (1920x1080) Split:
-        # Left: 1200x675 B-roll, Right: 544x960 Presenter
-        filter_complex = (
-            "[0:v]scale=1200:675:flags=lanczos[broll];"
-            "[1:v]scale=544:960:flags=lanczos[presenter];"
-            "color=c=0x07090e:s=1920x1080:d=10[bg];"
-            "[bg][broll]overlay=60:202[bg1];"
-            "[bg1][presenter]overlay=1316:60[v]"
-        )
+        # Perfectly over the right-hand Stage Pedestal (Act 3 layout)
+        bx = 1260
+        by = 470
 
+    mask_3ch, ring_rgb_bgr, ring_alpha_3ch = core_utils.ensure_ring_and_mask(bubble_size, theme=theme)
+
+    cap_bg = cv2.VideoCapture(str(broll_path))
+    cap_fg = cv2.VideoCapture(str(presenter_path))
+
+    fps = cap_bg.get(cv2.CAP_PROP_FPS) or 30.0
+    total_frames = int(cap_bg.get(cv2.CAP_PROP_FRAME_COUNT)) or 300
+    temp_video = root_dir / "output" / f"temp_stage_{ratio.replace(':', '_')}.mp4"
+
+    # Automated Face Tracking
+    trajectory = core_utils.auto_track_face(presenter_path, total_frames, fps, crop_size=crop_size)
+
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    writer = cv2.VideoWriter(str(temp_video), fourcc, fps, (canvas_w, canvas_h))
+
+    last_valid_fg = None
+
+    for frame_idx in range(total_frames):
+        ret_bg, frame_bg = cap_bg.read()
+        ret_fg, frame_fg = cap_fg.read()
+
+        if not ret_bg:
+            break
+
+        if ret_fg:
+            last_valid_fg = frame_fg
+        else:
+            frame_fg = last_valid_fg if last_valid_fg is not None else np.zeros((960, 544, 3), dtype=np.uint8)
+
+        if frame_bg.shape[1] != canvas_w or frame_bg.shape[0] != canvas_h:
+            frame_bg = cv2.resize(frame_bg, (canvas_w, canvas_h), interpolation=cv2.INTER_LANCZOS4)
+
+        # Crop using tracked trajectory
+        x1, y1 = trajectory[min(frame_idx, len(trajectory) - 1)]
+        crop = frame_fg[y1:y1 + crop_size, x1:x1 + crop_size]
+        crop_resized = cv2.resize(crop, (bubble_size, bubble_size), interpolation=cv2.INTER_LANCZOS4)
+
+        roi = frame_bg[by:by + bubble_size, bx:bx + bubble_size].astype(np.float32)
+        crop_float = crop_resized.astype(np.float32)
+
+        blended = roi * (1.0 - mask_3ch) + crop_float * mask_3ch
+        final_bubble = blended * (1.0 - ring_alpha_3ch) + ring_rgb_bgr * ring_alpha_3ch
+        frame_bg[by:by + bubble_size, bx:bx + bubble_size] = np.clip(final_bubble, 0, 255).astype(np.uint8)
+
+        writer.write(frame_bg)
+
+    cap_bg.release()
+    cap_fg.release()
+    writer.release()
+
+    # Mux audio via ffmpeg
     cmd = [
         "ffmpeg", "-y",
-        "-i", str(broll_path),
-        "-i", str(presenter_path),
-        "-filter_complex", filter_complex,
-        "-map", "[v]",
-        "-map", "1:a?",
+        "-i", str(temp_video),
+        "-i", str(audio_path if audio_path else presenter_path),
         "-c:v", "libx264", "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p",
         "-c:a", "aac", "-b:a", "192k",
         "-t", "10",
@@ -172,17 +212,20 @@ def assemble_method_split(root_dir: Path, broll_path: Path, presenter_path: Path
     if proc.returncode != 0:
         print(f"❌ FFmpeg Error in Method 2: {proc.stderr}")
         raise RuntimeError("FFmpeg encoding failed.")
+
+    if temp_video.exists():
+        temp_video.unlink()
     print(f"✅ Method 2 Complete! Output saved to: {output_path}")
 
 
-def assemble_method_dynamic(root_dir: Path, broll_path: Path, presenter_path: Path, audio_path: Path, output_path: Path, ratio: str = "16:9"):
+def assemble_method_dynamic(root_dir: Path, broll_path: Path, presenter_path: Path, audio_path: Path, output_path: Path, ratio: str = "16:9", theme: str = "ink-wash"):
     """
     Method 3: Multi-Shot Dynamic Cutaways.
     Shot 1 (0-2.5s): Full Presenter Hook (Hero Intro)
     Shot 2 (2.5-7.5s): Full B-roll terminal with compact Face Bubble
     Shot 3 (7.5-10s): Tech Split Screen signoff
     """
-    print(f"\n🚀 [ChatCut Engine] Executing Method 3: Dynamic Multi-Shot Cutaways [{ratio}]")
+    print(f"\n🚀 [ChatCut Engine] Executing Method 3: Dynamic Multi-Shot Cutaways [{ratio}] (Theme: {theme})")
 
     is_vertical = (ratio == "9:16")
     canvas_w, canvas_h = (1080, 1920) if is_vertical else (1920, 1080)
@@ -193,10 +236,11 @@ def assemble_method_dynamic(root_dir: Path, broll_path: Path, presenter_path: Pa
     shot3_out = root_dir / "output" / "temp_shot3.mp4"
 
     # Shot 1 (0 ~ 2.5s): Presenter Center Spotlight
+    pad_color = "0xfbfbfa" if theme == "ink-wash" else "0x0a0e17"
     cmd1 = [
         "ffmpeg", "-y",
         "-ss", "0.0", "-t", "2.5", "-i", str(presenter_path),
-        "-vf", f"scale=w={canvas_w}:h={canvas_h}:force_original_aspect_ratio=decrease,pad={canvas_w}:{canvas_h}:(ow-iw)/2:(oh-ih)/2:color=0x0a0e17",
+        "-vf", f"scale=w={canvas_w}:h={canvas_h}:force_original_aspect_ratio=decrease,pad={canvas_w}:{canvas_h}:(ow-iw)/2:(oh-ih)/2:color={pad_color}",
         "-c:v", "libx264", "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p", "-r", "30",
         "-an", str(shot1_out)
     ]
@@ -207,7 +251,7 @@ def assemble_method_dynamic(root_dir: Path, broll_path: Path, presenter_path: Pa
 
     # Shot 2 (2.5 ~ 7.5s): Face Bubble Cutaway
     shot2_full = root_dir / "output" / f"temp_bubble_full_{ratio.replace(':', '_')}.mp4"
-    assemble_method_bubble(root_dir, broll_path, presenter_path, audio_path, shot2_full, ratio=ratio)
+    assemble_method_bubble(root_dir, broll_path, presenter_path, audio_path, shot2_full, ratio=ratio, theme=theme)
 
     cmd2 = [
         "ffmpeg", "-y",
@@ -222,7 +266,7 @@ def assemble_method_dynamic(root_dir: Path, broll_path: Path, presenter_path: Pa
 
     # Shot 3 (7.5 ~ 10.0s): Split Screen Finish
     shot3_full = root_dir / "output" / f"temp_split_full_{ratio.replace(':', '_')}.mp4"
-    assemble_method_split(root_dir, broll_path, presenter_path, audio_path, shot3_full, ratio=ratio)
+    assemble_method_split(root_dir, broll_path, presenter_path, audio_path, shot3_full, ratio=ratio, theme=theme)
 
     cmd3 = [
         "ffmpeg", "-y",
@@ -356,7 +400,8 @@ def main():
     parser.add_argument("--mode", choices=["bubble", "split", "dynamic", "all"], default="all",
                         help="Assembly mode: bubble (Method 1), split (Method 2), dynamic (Method 3), or all")
     parser.add_argument("--ratio", choices=["16:9", "9:16"], default="16:9", help="Canvas aspect ratio: 16:9 or 9:16")
-    parser.add_argument("--project-name", default="Reasonix_CLI_Demo", help="Project name")
+    parser.add_argument("--theme", default="ink-wash", help="Design theme: ink-wash, prismatic-aurora, cyber-dark, etc.")
+    parser.add_argument("--project-name", default="HyperPresenter_Studio", help="Project name")
     args = parser.parse_args()
 
     root_dir = core_utils.get_project_root()
@@ -383,19 +428,20 @@ def main():
     print(f"📹 Presenter: {presenter_path.name}")
     print(f"💻 B-Roll: {broll_path.name}")
     print(f"📐 Aspect Ratio: {args.ratio}")
+    print(f"🎨 Theme: {args.theme}")
     print(f"🎯 Mode: {args.mode.upper()}")
     print("=" * 70)
 
     if args.mode in ["bubble", "all"]:
-        assemble_method_bubble(root_dir, broll_path, presenter_path, audio_path, bubble_out, ratio=args.ratio)
+        assemble_method_bubble(root_dir, broll_path, presenter_path, audio_path, bubble_out, ratio=args.ratio, theme=args.theme)
         build_chatcut_desktop_draft(args.project_name, "bubble", presenter_path, broll_path, ratio=args.ratio)
 
     if args.mode in ["split", "all"]:
-        assemble_method_split(root_dir, broll_path, presenter_path, audio_path, split_out, ratio=args.ratio)
+        assemble_method_split(root_dir, broll_path, presenter_path, audio_path, split_out, ratio=args.ratio, theme=args.theme)
         build_chatcut_desktop_draft(args.project_name, "split", presenter_path, broll_path, ratio=args.ratio)
 
     if args.mode in ["dynamic", "all"]:
-        assemble_method_dynamic(root_dir, broll_path, presenter_path, audio_path, dynamic_out, ratio=args.ratio)
+        assemble_method_dynamic(root_dir, broll_path, presenter_path, audio_path, dynamic_out, ratio=args.ratio, theme=args.theme)
         build_chatcut_desktop_draft(args.project_name, "dynamic", presenter_path, broll_path, ratio=args.ratio)
 
     print("\n" + "=" * 70)

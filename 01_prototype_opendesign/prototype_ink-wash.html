@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-CN" data-resolution="landscape">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1920, height=1080" />
-    <title>HyperPresenter Studio - 3-Act Chinese Ink Wash Explainer</title>
+    <title>OpenDesign 交互原型 Demo · 现代新中式宣白水墨风 (16:9)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -27,8 +27,8 @@
         -webkit-font-smoothing: antialiased;
       }
 
-      /* 宣纸水墨大画布 */
-      #root {
+      /* 宣纸山水水墨背景画布 */
+      #canvas-root {
         position: relative;
         width: 1920px;
         height: 1080px;
@@ -36,23 +36,23 @@
         align-items: center;
         justify-content: center;
         background-color: #f6f5ef;
-        background-image: url('assets/ink_wash_bg.jpg');
+        background-image: url('../assets/ink_wash_bg.jpg');
         background-size: cover;
         background-position: center bottom;
         background-repeat: no-repeat;
         overflow: hidden;
       }
 
-      /* 宣纸微透光柔化蒙层 */
+      /* 宣纸微透光柔化蒙层：既能保留水墨山水画意，又能确保大字高对比清晰可读 */
       .paper-overlay {
         position: absolute;
         inset: 0;
-        background: radial-gradient(circle at 50% 40%, rgba(251, 251, 248, 0.75) 0%, rgba(245, 243, 235, 0.88) 75%, rgba(235, 232, 222, 0.95) 100%);
+        background: radial-gradient(circle at 50% 40%, rgba(251, 251, 248, 0.72) 0%, rgba(245, 243, 235, 0.88) 75%, rgba(235, 232, 222, 0.95) 100%);
         backdrop-filter: blur(2px);
         pointer-events: none;
       }
 
-      /* 水墨浓淡流动光晕 */
+      /* 水墨浓淡流动光晕 (Ink Wash Orbs) */
       .ink-smoke {
         position: absolute;
         border-radius: 50%;
@@ -76,25 +76,26 @@
         filter: blur(80px);
       }
 
-      /* 顶栏品牌与三幕进度导航 */
-      .top-nav {
+      /* 交互控制顶栏 (Toolbar) */
+      .demo-toolbar {
         position: absolute;
-        top: 32px;
-        left: 60px;
-        right: 60px;
+        top: 24px;
+        left: 50px;
+        right: 50px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        z-index: 50;
+        z-index: 100;
       }
-      .brand-box {
+
+      .brand-group {
         display: flex;
         align-items: center;
         gap: 16px;
       }
       .seal-logo {
-        width: 48px;
-        height: 48px;
+        width: 50px;
+        height: 50px;
         border: 2.5px solid #b91c1c;
         border-radius: 10px;
         display: flex;
@@ -104,66 +105,113 @@
         color: #b91c1c;
         font-family: 'Ma Shan Zheng', cursive;
         font-weight: 900;
-        font-size: 28px;
+        font-size: 30px;
         box-shadow: 0 4px 16px rgba(185, 28, 28, 0.2);
       }
-      .brand-name {
+      .brand-title-wrap {
+        display: flex;
+        flex-direction: column;
+      }
+      .brand-title {
         font-family: 'Ma Shan Zheng', cursive;
         font-size: 32px;
         font-weight: 900;
         color: #111113;
         letter-spacing: 1px;
       }
-      .brand-desc {
+      .brand-subtitle {
         font-size: 14px;
         font-weight: 700;
         color: #52525b;
       }
 
-      /* 三幕导航胶囊 */
-      .stepper-nav {
+      /* 三幕导航胶囊按钮 */
+      .act-nav-capsule {
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 8px 18px;
+        padding: 6px 12px;
         border-radius: 9999px;
         background: rgba(255, 255, 255, 0.94);
         border: 1.5px solid rgba(24, 24, 27, 0.12);
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
       }
-      .step-item {
+      .act-btn {
+        padding: 10px 22px;
+        border-radius: 9999px;
+        border: none;
+        background: transparent;
+        font-size: 16px;
+        font-weight: 800;
+        color: #52525b;
+        cursor: pointer;
+        transition: all 0.25s ease;
         display: flex;
         align-items: center;
         gap: 8px;
-        font-size: 15px;
-        font-weight: 800;
-        color: #71717a;
-        transition: all 0.3s ease;
       }
-      .step-dot {
+      .act-btn:hover {
+        color: #111113;
+        background: rgba(24, 24, 27, 0.05);
+      }
+      .act-btn.active {
+        background: #18181b;
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(24, 24, 27, 0.25);
+      }
+      .act-btn.active .seal-dot {
+        background: #dc2626;
+      }
+      .seal-dot {
         width: 8px;
         height: 8px;
         border-radius: 50%;
         background: #a1a1aa;
       }
-      .step-item.active {
-        color: #111113;
+
+      /* 播放控制 */
+      .playback-group {
+        display: flex;
+        align-items: center;
+        gap: 16px;
       }
-      .step-item.active .step-dot {
+      .play-btn {
+        padding: 11px 26px;
+        border-radius: 9999px;
+        border: 1.5px solid #dc2626;
         background: #dc2626;
-        box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 8px;
       }
-      .step-divider {
-        color: rgba(24, 24, 27, 0.2);
-        font-size: 13px;
+      .play-btn:hover {
+        background: #b91c1c;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 22px rgba(220, 38, 38, 0.4);
+      }
+      .time-counter {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 16px;
+        font-weight: 800;
+        color: #18181b;
+        padding: 9px 18px;
+        background: rgba(255, 255, 255, 0.94);
+        border: 1.5px solid rgba(24, 24, 27, 0.12);
+        border-radius: 9999px;
       }
 
-      /* 主体视窗区域 */
+      /* 主体视窗区域 (更大尺寸，填充画布) */
       .stage-viewport {
         position: relative;
         width: 1680px;
         height: 880px;
-        margin-top: 55px;
+        margin-top: 60px;
       }
 
       /* 通用幕布容器 */
@@ -175,12 +223,20 @@
         align-items: center;
         justify-content: flex-start;
         opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        transform: translateY(20px) scale(0.98);
+      }
+      .scene.active {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0) scale(1);
       }
 
       /* 醒目超大标题区域 */
       .scene-header {
         text-align: center;
-        margin-bottom: 28px;
+        margin-bottom: 30px;
       }
       .scene-badge-row {
         display: inline-flex;
@@ -212,7 +268,7 @@
         font-weight: 700;
       }
 
-      /* 朱砂印章徽标 */
+      /* 朱砂印章徽标 (印章字体与印鉴红) */
       .vermilion-seal {
         display: inline-flex;
         align-items: center;
@@ -230,7 +286,7 @@
       }
 
       /* ========================================================
-         第一幕 · 砚池启墨
+         第一幕 · 砚池启墨 (超大终端画卷卡片)
          ======================================================== */
       .terminal-ink-card {
         width: 1420px;
@@ -298,8 +354,14 @@
         height: 38px;
         background: #dc2626;
         vertical-align: middle;
+        animation: blink 0.9s infinite;
+      }
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
       }
 
+      /* 三枚特大印章卡片 */
       .chips-row {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -343,7 +405,7 @@
       }
 
       /* ========================================================
-         第二幕 · 墨卷舒展 (Bento Grid)
+         第二幕 · 墨卷舒展 (特大三大核心功能 Bento Grid)
          ======================================================== */
       .bento-grid {
         width: 1540px;
@@ -410,6 +472,7 @@
         gap: 14px;
       }
 
+      /* 动效波形与指标 */
       .wave-container {
         display: flex;
         align-items: flex-end;
@@ -420,10 +483,11 @@
         flex: 1;
         background: #0d9488;
         border-radius: 5px;
+        transition: height 0.3s ease;
       }
 
       /* ========================================================
-         第三幕 · 丹青落款 (演播台融合)
+         第三幕 · 丹青落款 (成片交付与真身演播台融合)
          ======================================================== */
       .stage-fusion-container {
         width: 1540px;
@@ -433,6 +497,7 @@
         align-items: center;
       }
 
+      /* 左侧 100% 全比例成片草稿卡片 */
       .draft-master-card {
         background: rgba(255, 255, 255, 0.96);
         border: 2px solid rgba(24, 24, 27, 0.15);
@@ -466,6 +531,7 @@
         border: 1.5px solid rgba(24, 24, 27, 0.1);
       }
 
+      /* 墨线时间轴进度条 */
       .ink-progress-wrap {
         display: flex;
         flex-direction: column;
@@ -486,11 +552,12 @@
       }
       .ink-progress-fill {
         height: 100%;
-        width: 0%;
+        width: 100%;
         background: linear-gradient(90deg, #18181b 30%, #dc2626 100%);
         border-radius: 9999px;
       }
 
+      /* 右侧演播台预留融合区 */
       .presenter-studio-portal {
         height: 520px;
         background: rgba(255, 255, 255, 0.94);
@@ -543,45 +610,51 @@
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-width="1920" data-height="1080">
+    <div id="canvas-root">
       <div class="paper-overlay"></div>
       <div id="ink-smoke-1" class="ink-smoke"></div>
       <div id="ink-smoke-2" class="ink-smoke"></div>
 
-      <!-- 顶栏导航 -->
-      <header class="top-nav">
-        <div class="brand-box">
+      <!-- 顶栏交互走查控制器 -->
+      <div class="demo-toolbar">
+        <div class="brand-group">
           <div class="seal-logo">墨</div>
-          <div>
-            <div class="brand-name">HyperPresenter Studio</div>
-            <div class="brand-desc">现代新中式宣白水墨风 · 1080P 60FPS 极客动效</div>
+          <div class="brand-title-wrap">
+            <span class="brand-title">HyperPresenter Studio</span>
+            <span class="brand-subtitle">现代新中式宣白水墨风 · 16:9 交互原型 Demo</span>
           </div>
         </div>
 
-        <nav class="stepper-nav">
-          <div class="step-item active" id="nav-step-1">
-            <span class="step-dot"></span>
-            <span>一 · 砚池启墨 (安装)</span>
-          </div>
-          <span class="step-divider">/</span>
-          <div class="step-item" id="nav-step-2">
-            <span class="step-dot"></span>
-            <span>二 · 墨卷舒展 (功能)</span>
-          </div>
-          <span class="step-divider">/</span>
-          <div class="step-item" id="nav-step-3">
-            <span class="step-dot"></span>
-            <span>三 · 丹青落款 (交付)</span>
-          </div>
-        </nav>
-      </header>
+        <div class="act-nav-capsule">
+          <button class="act-btn active" onclick="switchAct(1)" id="btn-act-1">
+            <span class="seal-dot"></span>
+            第一幕 · 砚池启墨 (安装)
+          </button>
+          <button class="act-btn" onclick="switchAct(2)" id="btn-act-2">
+            <span class="seal-dot"></span>
+            第二幕 · 墨卷舒展 (功能)
+          </button>
+          <button class="act-btn" onclick="switchAct(3)" id="btn-act-3">
+            <span class="seal-dot"></span>
+            第三幕 · 丹青落款 (交付)
+          </button>
+        </div>
 
-      <!-- 主视窗 -->
-      <main class="stage-viewport">
+        <div class="playback-group">
+          <div class="time-counter" id="timer-display">⏱️ 00:00.0 / 10.0s</div>
+          <button class="play-btn" onclick="toggleAutoPlay()" id="play-btn-toggle">
+            <span>▶</span>
+            <span id="play-text">自动播放 10s 演示</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 主体视窗区域 -->
+      <div class="stage-viewport">
         <!-- ========================================================
              第一幕：安装与部署 (0.0s - 3.2s)
              ======================================================== -->
-        <section class="scene" id="scene-act1">
+        <div class="scene active" id="scene-1">
           <div class="scene-header">
             <div class="scene-badge-row">
               <span class="vermilion-seal">启墨</span>
@@ -605,40 +678,40 @@
             <div class="terminal-ink-body">
               <div class="cmd-row">
                 <span class="cmd-prefix">❯</span>
-                <span class="cmd-text" id="typewriter-cmd"></span>
+                <span class="cmd-text" id="demo-cmd">npx hyper-presenter setup --preset ink-wash</span>
                 <span class="cmd-cursor"></span>
               </div>
 
               <div class="chips-row">
-                <div class="chip-card" id="act1-chip-1">
+                <div class="chip-card">
                   <span class="vermilion-seal">印</span>
                   <div class="chip-text">OpenDesign 视觉原型</div>
                 </div>
-                <div class="chip-card" id="act1-chip-2">
+                <div class="chip-card">
                   <span class="vermilion-seal">印</span>
                   <div class="chip-text">HyperFrames 60FPS 动效</div>
                 </div>
-                <div class="chip-card" id="act1-chip-3">
+                <div class="chip-card">
                   <span class="vermilion-seal">印</span>
                   <div class="chip-text">ChatCut 自动化剪辑</div>
                 </div>
               </div>
 
-              <div class="status-stamp-bar" id="act1-status-bar">
+              <div class="status-stamp-bar">
                 <div class="status-stamp-text">
                   <span style="font-size: 28px;">✔</span>
-                  <span id="act1-status-text">全套核心引擎与依赖项初始化完成 · 0 手动配置</span>
+                  <span>全套核心引擎与依赖项初始化完成 · 0 手动配置</span>
                 </div>
                 <div class="vermilion-seal" style="font-size: 20px; padding: 6px 18px;">准予开工</div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
 
         <!-- ========================================================
-             第二幕：核心功能与使用 (3.2s - 6.8s)
+             第二幕：核心功能与使用 (3.3s - 6.8s)
              ======================================================== -->
-        <section class="scene" id="scene-act2">
+        <div class="scene" id="scene-2">
           <div class="scene-header">
             <div class="scene-badge-row">
               <span class="vermilion-seal">舒展</span>
@@ -649,7 +722,8 @@
           </div>
 
           <div class="bento-grid">
-            <div class="bento-card bento-1" id="bento-1">
+            <!-- 卡片 1 -->
+            <div class="bento-card bento-1">
               <div>
                 <div class="bento-tag-wrap">
                   <span class="vermilion-seal">设计基石</span>
@@ -667,7 +741,8 @@
               </div>
             </div>
 
-            <div class="bento-card bento-2" id="bento-2">
+            <!-- 卡片 2 -->
+            <div class="bento-card bento-2">
               <div>
                 <div class="bento-tag-wrap">
                   <span class="vermilion-seal" style="border-color: #0d9488; color: #0d9488; background: #f0fdfa;">动效灵魂</span>
@@ -681,19 +756,20 @@
                   <span>60 FPS SMOOTH</span>
                   <span>1080P PRO</span>
                 </div>
-                <div class="wave-container">
-                  <div class="wave-bar" id="wb-1" style="height: 40%;"></div>
-                  <div class="wave-bar" id="wb-2" style="height: 80%;"></div>
-                  <div class="wave-bar" id="wb-3" style="height: 60%;"></div>
-                  <div class="wave-bar" id="wb-4" style="height: 95%;"></div>
-                  <div class="wave-bar" id="wb-5" style="height: 50%;"></div>
-                  <div class="wave-bar" id="wb-6" style="height: 75%;"></div>
-                  <div class="wave-bar" id="wb-7" style="height: 35%;"></div>
+                <div class="wave-container" id="equalizer">
+                  <div class="wave-bar" style="height: 40%;"></div>
+                  <div class="wave-bar" style="height: 80%;"></div>
+                  <div class="wave-bar" style="height: 60%;"></div>
+                  <div class="wave-bar" style="height: 95%;"></div>
+                  <div class="wave-bar" style="height: 50%;"></div>
+                  <div class="wave-bar" style="height: 75%;"></div>
+                  <div class="wave-bar" style="height: 35%;"></div>
                 </div>
               </div>
             </div>
 
-            <div class="bento-card bento-3" id="bento-3">
+            <!-- 卡片 3 -->
+            <div class="bento-card bento-3">
               <div>
                 <div class="bento-tag-wrap">
                   <span class="vermilion-seal" style="border-color: #4338ca; color: #4338ca; background: #eef2ff;">智能总装</span>
@@ -711,12 +787,12 @@
               </div>
             </div>
           </div>
-        </section>
+        </div>
 
         <!-- ========================================================
-             第三幕 · 丹青落款 (6.8s - 10.0s)
+             第三幕 · 丹青落款 (成片交付与演播室融合)
              ======================================================== -->
-        <section class="scene" id="scene-act3">
+        <div class="scene" id="scene-3">
           <div class="scene-header">
             <div class="scene-badge-row">
               <span class="vermilion-seal">落款</span>
@@ -727,10 +803,11 @@
           </div>
 
           <div class="stage-fusion-container">
-            <div class="draft-master-card" id="act3-draft-card">
+            <!-- 左侧 100% 全比例成片草稿卡片 -->
+            <div class="draft-master-card">
               <div class="draft-headline-row">
                 <h2 class="draft-headline">剪映桌面端草稿已就绪</h2>
-                <span class="vermilion-seal" id="act3-seal" style="font-size: 20px; padding: 8px 18px;">已置顶生成</span>
+                <span class="vermilion-seal" style="font-size: 20px; padding: 8px 18px;">已置顶生成</span>
               </div>
 
               <div class="file-path-box">
@@ -743,7 +820,7 @@
                   <span style="color: #b91c1c;">100% COMPLETED</span>
                 </div>
                 <div class="ink-progress-track">
-                  <div class="ink-progress-fill" id="act3-progress-bar"></div>
+                  <div class="ink-progress-fill" id="act3-progress"></div>
                 </div>
               </div>
 
@@ -759,8 +836,9 @@
               </div>
             </div>
 
-            <div class="presenter-studio-portal" id="act3-stage-card">
-              <div class="studio-avatar-ring" id="act3-avatar-ring"></div>
+            <!-- 右侧真人口播演播台融合区 -->
+            <div class="presenter-studio-portal">
+              <div class="studio-avatar-ring"></div>
               <h3 class="portal-title">真身演播台融合</h3>
               <p class="portal-desc">
                 右侧无缝嵌入 EMA 人脸平滑追踪画面<br />
@@ -769,132 +847,97 @@
               </p>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </div>
     </div>
 
-    <!-- GSAP 60FPS Master Timeline -->
     <script>
-      const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
-      const commandText = "npx hyper-presenter setup --preset ink-wash";
-      const cmdElement = document.getElementById("typewriter-cmd");
+      let currentAct = 1;
+      let isPlaying = false;
+      let timerInterval = null;
+      let startTime = null;
 
-      // Initial States
-      gsap.set("#scene-act1", { opacity: 0, scale: 0.94, y: 30 });
-      gsap.set("#scene-act2", { opacity: 0, scale: 0.94, y: 30 });
-      gsap.set("#scene-act3", { opacity: 0, scale: 0.94, y: 30 });
-
-      gsap.set("#act1-chip-1", { opacity: 0, y: 20 });
-      gsap.set("#act1-chip-2", { opacity: 0, y: 20 });
-      gsap.set("#act1-chip-3", { opacity: 0, y: 20 });
-      gsap.set("#act1-status-bar", { opacity: 0, y: 15 });
-
-      gsap.set("#bento-1", { opacity: 0, y: 35 });
-      gsap.set("#bento-2", { opacity: 0, y: 35 });
-      gsap.set("#bento-3", { opacity: 0, y: 35 });
-
-      gsap.set("#act3-draft-card", { opacity: 0, x: -30 });
-      gsap.set("#act3-stage-card", { opacity: 0, x: 30 });
-      gsap.set("#act3-progress-bar", { width: "0%" });
-      gsap.set("#act3-seal", { scale: 0.6, opacity: 0 });
-
-      function setNavStep(step) {
-        document.querySelectorAll(".step-item").forEach((el, idx) => {
-          if (idx + 1 === step) {
-            el.classList.add("active");
+      function switchAct(act) {
+        currentAct = act;
+        document.querySelectorAll('.scene').forEach((sc, i) => {
+          if (i + 1 === act) {
+            sc.classList.add('active');
           } else {
-            el.classList.remove("active");
+            sc.classList.remove('active');
           }
+        });
+
+        document.querySelectorAll('.act-btn').forEach((btn, i) => {
+          if (i + 1 === act) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+
+        if (act === 2) {
+          animateEqualizer();
+        }
+      }
+
+      function animateEqualizer() {
+        const bars = document.querySelectorAll('.wave-bar');
+        bars.forEach((b, i) => {
+          b.style.height = `${25 + (Math.sin(Date.now() / 200 + i) * 35 + 35)}%`;
         });
       }
 
-      // Background ambient ink wash movement (finite 10s loop)
-      tl.to("#ink-smoke-1", { x: 60, y: 40, duration: 5, yoyo: true, repeat: 1, ease: "sine.inOut" }, 0);
-      tl.to("#ink-smoke-2", { x: -50, y: -40, duration: 5, yoyo: true, repeat: 1, ease: "sine.inOut" }, 0);
-
-      // ========================================================
-      // 1. ACT 1: 砚池启墨 (0.0s ~ 3.2s)
-      // ========================================================
-      tl.call(() => setNavStep(1), null, 0.0);
-      tl.to("#scene-act1", { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power3.out" }, 0.15);
-
-      // Typewriter (0.5s - 1.5s)
-      const typeCounter = { len: 0 };
-      tl.to(typeCounter, {
-        len: commandText.length,
-        duration: 0.95,
-        ease: "none",
-        onUpdate: () => {
-          cmdElement.textContent = commandText.substring(0, Math.round(typeCounter.len));
+      function toggleAutoPlay() {
+        if (isPlaying) {
+          stopAutoPlay();
+        } else {
+          startAutoPlay();
         }
-      }, 0.5);
-
-      // 3 Chips entrance (1.5s - 2.1s)
-      tl.to("#act1-chip-1", { opacity: 1, y: 0, duration: 0.35, ease: "back.out(1.5)" }, 1.5);
-      tl.to("#act1-chip-2", { opacity: 1, y: 0, duration: 0.35, ease: "back.out(1.5)" }, 1.75);
-      tl.to("#act1-chip-3", { opacity: 1, y: 0, duration: 0.35, ease: "back.out(1.5)" }, 2.0);
-
-      // Status bar confirmation (2.2s - 2.5s)
-      tl.to("#act1-status-bar", { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 2.2);
-
-      // Act 1 Outro (2.95s - 3.25s)
-      tl.to("#scene-act1", { opacity: 0, scale: 0.96, y: -20, duration: 0.3, ease: "power2.in" }, 2.95);
-
-      // ========================================================
-      // 2. ACT 2: 墨卷舒展 (3.25s ~ 6.75s)
-      // ========================================================
-      tl.call(() => setNavStep(2), null, 3.25);
-      tl.to("#scene-act2", { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "power3.out" }, 3.3);
-
-      // Bento cards cascade entrance (3.4s - 4.1s)
-      tl.to("#bento-1", { opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.4)" }, 3.4);
-      tl.to("#bento-2", { opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.4)" }, 3.65);
-      tl.to("#bento-3", { opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.4)" }, 3.9);
-
-      // Equalizer bars pulsing during Act 2 (3.8s - 6.5s)
-      for (let i = 1; i <= 7; i++) {
-        tl.to(`#wb-${i}`, {
-          height: `${30 + ((i * 19) % 65)}%`,
-          duration: 0.35,
-          yoyo: true,
-          repeat: 6,
-          ease: "sine.inOut"
-        }, 3.8 + i * 0.05);
       }
 
-      // Act 2 Outro (6.45s - 6.75s)
-      tl.to("#scene-act2", { opacity: 0, scale: 0.96, y: -20, duration: 0.3, ease: "power2.in" }, 6.45);
+      function startAutoPlay() {
+        isPlaying = true;
+        document.getElementById('play-text').textContent = '停止播放';
+        document.getElementById('play-btn-toggle').style.background = '#18181b';
+        document.getElementById('play-btn-toggle').style.borderColor = '#18181b';
 
-      // ========================================================
-      // 3. ACT 3: 丹青落款 (6.75s ~ 10.0s)
-      // ========================================================
-      tl.call(() => setNavStep(3), null, 6.75);
-      tl.to("#scene-act3", { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "power3.out" }, 6.8);
+        startTime = performance.now();
+        switchAct(1);
 
-      // Cards slide in
-      tl.to("#act3-draft-card", { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 6.85);
-      tl.to("#act3-stage-card", { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 7.0);
+        timerInterval = setInterval(() => {
+          const elapsed = (performance.now() - startTime) / 1000;
+          if (elapsed >= 10.0) {
+            stopAutoPlay();
+            document.getElementById('timer-display').textContent = '⏱️ 10:00.0 / 10.0s (定格)';
+            return;
+          }
 
-      // Progress bar fill (7.0s - 9.0s)
-      tl.to("#act3-progress-bar", { width: "100%", duration: 2.0, ease: "power1.inOut" }, 7.0);
+          const sec = Math.floor(elapsed);
+          const ms = Math.floor((elapsed - sec) * 10);
+          document.getElementById('timer-display').textContent = `⏱️ 0${sec}:${ms}0.0 / 10.0s`;
 
-      // Seal stamp stamps down with impact (7.4s)
-      tl.to("#act3-seal", { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 7.4);
+          if (elapsed >= 6.8 && currentAct !== 3) {
+            switchAct(3);
+          } else if (elapsed >= 3.3 && elapsed < 6.8 && currentAct !== 2) {
+            switchAct(2);
+          }
+          if (currentAct === 2) {
+            animateEqualizer();
+          }
+        }, 80);
+      }
 
-      // Glowing pulse on presenter avatar ring (7.2s - 10.0s)
-      tl.to("#act3-avatar-ring", {
-        boxShadow: "0 0 55px rgba(220, 38, 38, 0.45), inset 0 0 35px rgba(220, 38, 38, 0.2)",
-        scale: 1.03,
-        duration: 0.8,
-        yoyo: true,
-        repeat: 3,
-        ease: "sine.inOut"
-      }, 7.2);
+      function stopAutoPlay() {
+        isPlaying = false;
+        clearInterval(timerInterval);
+        document.getElementById('play-text').textContent = '自动播放 10s 演示';
+        document.getElementById('play-btn-toggle').style.background = '#dc2626';
+        document.getElementById('play-btn-toggle').style.borderColor = '#dc2626';
+      }
 
-      // HyperFrames hook
-      window.__timelines = window.__timelines || {};
-      window.__timelines["main"] = tl;
-      tl.seek(0);
+      // Initial micro-pulse for ink orbs
+      gsap.to('#ink-smoke-1', { x: 50, y: 30, duration: 6, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+      gsap.to('#ink-smoke-2', { x: -40, y: -40, duration: 7, yoyo: true, repeat: -1, ease: 'sine.inOut' });
     </script>
   </body>
 </html>

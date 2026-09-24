@@ -64,40 +64,42 @@ flowchart LR
 hyper-presenter-studio/
 ├── 01_prototype_opendesign/          # 第一阶段：OpenDesign 原型沉淀区
 │   ├── generate_prototype.py         # 原型与 Token 自动化生成脚本 (支持 16:9 & 9:16)
-│   ├── prototype_cyber-dark.html     # 赛博暗黑主题 (横屏 1920x1080)
-│   ├── prototype_cyber-dark_9x16.html# 赛博暗黑主题 (竖屏 1080x1920 移动端卡片)
+│   ├── prototype_ink-wash.html       # 现代新中式宣白水墨风 (1920x1080 毛笔大字)
+│   ├── prototype_prismatic-aurora.html# 五彩极光流光主题
+│   ├── prototype_cyber-dark.html     # 赛博暗黑主题
 │   ├── prototype_matrix-neon.html    # 极客骇客绿主题
 │   ├── prototype_cyber-purple.html   # 赛博霓虹紫主题
 │   └── tokens/                       # 导出的 JSON 设计 Token (配色/排版/圆角)
 │
 ├── 02_motion_hyperframes/            # 第二阶段：HyperFrames 代码动效工程
 │   ├── index.html                    # 横屏 16:9 动效工程入口 (GSAP 逐字打字机)
-│   ├── index_vertical.html           # 竖屏 9:16 移动端动效工程入口
 │   ├── hyperframes.json              # 动效工程配置
-│   └── package.json                  # HyperFrames 局部依赖
+│   ├── package.json                  # HyperFrames 局部依赖
+│   ├── assets/                       # 局部视效资产 (ink_wash_bg.jpg 等)
+│   └── templates/                    # 竖屏备用模板 (index_vertical.html 隔离区)
 │
 ├── 03_presenter_aroll/               # 第三阶段：真人口播摄制指南
 │   ├── generate_shooting_guide.py    # 专属拍摄指南与提词卡生成器
-│   ├── CURRENT_SHOOTING_GUIDE.md     # 横屏 16:9 秒级分镜卡点指南 (向左前方指引)
-│   └── CURRENT_SHOOTING_GUIDE_9x16.md# 竖屏 9:16 移动端卡点指南 (向上指引/安全区)
+│   ├── CURRENT_SHOOTING_GUIDE.md     # 横屏 16:9 秒级分镜卡点指南
+│   └── CURRENT_SHOOTING_GUIDE_9x16.md# 竖屏 9:16 移动端卡点指南
 │
 ├── 04_assembly_capcut/               # 第四阶段：ChatCut 自动化总装引擎
 │   ├── core_utils.py                 # 底层工具库：人脸平滑跟踪、动态资产嗅探、剪映索引注册
 │   ├── propose_edit_schemes.py       # 剪辑提案与 Demo 抽帧预览生成器 (双画幅)
 │   └── chatcut_auto_assembly.py      # 100% 自动总装引擎 (Bubble / Split / Dynamic)
 │
-├── assets/                           # 永久视效资产库
-│   ├── circle_ring.png               # 赛博青 #38bdf8 霓虹能量光环 (附 Pillow 自愈脚本)
-│   └── circle_mask.png               # 极客抗锯齿圆形蒙版
-│
+├── assets/                           # 永久视效资产库 (ink_wash_bg.jpg, circle_ring.png 等)
+├── scripts/                          # 工程化自动化脚本
+│   └── capture_demo_shots.js         # 原型 Demo 三幕高清实拍图自动捕获工具 (Puppeteer)
 ├── output/                           # 成品出片与提案审查库
-│   ├── broll_motion.mp4              # HyperFrames 渲染的标准 B-Roll 视频
-│   ├── EDITING_PROPOSAL.md           # 16:9 剪辑提案审查报告
-│   ├── EDITING_PROPOSAL_9X16.md      # 9:16 剪辑提案审查报告
+│   ├── broll_motion.mp4              # HyperFrames 渲染的标准 1080P B-Roll 视频
+│   ├── screenshots/                  # 走查实拍图与成片抽帧帧库
 │   └── *.mp4                         # 自动总装生成的交付视频
 │
 ├── templates/                        # 开箱即用实战模板
-├── WORKFLOW_SOP.md                   # 4 阶段全流程标准作业程序 (SOP)
+├── archive/                          # 历史素材与测试视频安全归档库
+├── run_pipeline.py                   # ⚡ 统一工业级流水线总控 CLI (Master Pipeline Orchestrator)
+├── WORKFLOW_SOP.md                   # 5 阶段导演级人机协同作业程序 (SOP)
 ├── ARCHITECTURE.md                   # 详细架构与技术设计文档
 ├── REVIEW.md                         # 架构盲审报告与修复追踪
 ├── requirements.txt                  # Python 依赖清单 (OpenCV, Pillow, numpy)
@@ -107,7 +109,39 @@ hyper-presenter-studio/
 
 ---
 
-## 🚀 三、 快速上手指南 (Quick Start)
+## ⚡ 统一流水线总控 (Unified Pipeline CLI)
+
+推荐直接使用根目录的工业级总控脚本 `run_pipeline.py`：
+
+```bash
+# 查看全流程健康状态
+python run_pipeline.py --status
+
+# 阶段 1：生成 UI 原型与设计 Token
+python run_pipeline.py --step 1 --theme ink-wash
+
+# 阶段 1.5：提取三幕高清实拍图供用户视觉走查
+python run_pipeline.py --capture-demo
+
+# 阶段 2：编译 60FPS 3幕式极客 B-Roll 并自动抽帧
+python run_pipeline.py --step 2
+
+# 阶段 3：生成 10s 秒级分镜卡点与提词卡
+python run_pipeline.py --step 3
+
+# 阶段 4：执行人脸平滑追踪并自动总装注入剪映
+python run_pipeline.py --step 4
+
+# 一键贯通跑完全部 4 阶流水线
+python run_pipeline.py --all
+
+# 快速实测：一键恢复历史口播素材
+python run_pipeline.py --restore-demo
+```
+
+---
+
+## 🚀 三、 传统分步上手指南 (Granular CLI)
 
 ### 1. 环境准备
 确保本机已安装 [Node.js (>= 20.0)](https://nodejs.org/) 与 [Python (>= 3.10)](https://python.org/)：

@@ -1,7 +1,7 @@
 {
   "project": "HyperPresenter Studio",
-  "theme": "cyber-dark",
-  "name": "Cyber Dark (赛博青暗黑极客风)",
+  "theme": "prismatic-aurora",
+  "name": "Prismatic Aurora (极光五彩绚烂风)",
   "resolution": {
     "width": 1920,
     "height": 1080,
@@ -9,14 +9,14 @@
   },
   "colors": {
     "primary": "#38bdf8",
-    "secondary": "#818cf8",
-    "accent": "#34d399",
-    "window_background": "rgba(13, 20, 36, 0.78)",
-    "window_border": "rgba(56, 189, 248, 0.22)",
-    "text_main": "#f8fafc",
-    "text_dim": "#64748b",
-    "tag_background": "rgba(56, 189, 248, 0.14)",
-    "tag_border": "rgba(56, 189, 248, 0.35)"
+    "secondary": "#f472b6",
+    "accent": "#fbbf24",
+    "window_background": "rgba(20, 14, 38, 0.84)",
+    "window_border": "rgba(244, 114, 182, 0.38)",
+    "text_main": "#ffffff",
+    "text_dim": "#a5b4fc",
+    "tag_background": "linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(244, 114, 182, 0.2))",
+    "tag_border": "rgba(244, 114, 182, 0.5)"
   },
   "typography": {
     "font_family_code": "JetBrains Mono, Consolas, monospace",

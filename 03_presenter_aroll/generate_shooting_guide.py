@@ -20,7 +20,7 @@ if sys.stdout and hasattr(sys.stdout, "reconfigure"):
         pass
 
 
-def generate_guide_markdown(title: str, duration: int, core_command: str, ratio: str = "16:9") -> str:
+def generate_guide_markdown(title: str, duration: int, core_command: str, ratio: str = "16:9", theme: str = "ink-wash") -> str:
     is_vertical = (ratio == "9:16")
     min_words = int(duration * 3.2)
     max_words = int(duration * 4.0)
@@ -44,12 +44,29 @@ def generate_guide_markdown(title: str, duration: int, core_command: str, ratio:
         camera_cue = "手机或相机水平横置，**双眼对齐画面上方 1/3 水平线**，面部居中微偏右"
         safe_zone_cue = "• 四周留出 5% 电视播控安全边距<br>• 保持左右画面干净，方便后期叠加发光圆框或双分屏"
         gesture_cue = f"• **右手抬起，食指坚定指向左侧/前方**（指引观众看向左侧大屏代码窗口）<br>• 语气笃定、专业、有掌控感"
-        framing_strategy = "横屏或竖屏半身录制均可，ChatCut 自动进行 EMA 人脸追踪居中裁剪，生成右侧分屏或右下角发光气泡"
+        framing_strategy = "横屏或竖屏半身录制均可，ChatCut 自动进行 EMA 人脸追踪居中裁剪，生成全画幅演播室无损融合"
+
+    # Theme-aware B-roll visual cues
+    if theme == "ink-wash":
+        cue_act1 = "宣纸泼墨展卷，Ma Shan Zheng 书法大字与终端命令淡入，光标流转"
+        cue_act2 = "键盘极客敲击声起，依赖进度条 0% 飙至 100%，朱砂印章与对勾点亮"
+        cue_act3 = "三幕成片 Bento 矩阵铺展，全画幅演播室无损融合，朱砂印章钤印"
+        script_act1 = "“告别繁琐安装，一行指令开启极简创作！”"
+        script_act2 = f"“终端敲入 `{core_command}`，全流程秒级跑通！”"
+        script_act3 = "“一键自动总装，广播级成片即刻出炉！”"
+    else:
+        cue_act1 = "终端窗口淡入，光标高频闪烁，准备就绪"
+        cue_act2 = "键盘极客敲击声起，依赖安装条 0% 飙到 100%，绿色对勾亮起"
+        cue_act3 = "科技高光粒子划过，Pipeline 流式状态初始化完成"
+        script_act1 = "“还在为繁琐的配置头疼？看这里！”"
+        script_act2 = f"“只需在终端敲入 `{core_command}`，一键跑通！”"
+        script_act3 = "“立即体验，把时间留给创造。”"
 
     md = f"""# 🎙️ 《{title}》极客口播拍摄蓝图与提词卡 ({ratio_title})
 
 > **生成目标**：{title} 官方演示视频（配套 HyperFrames 工业级代码动效 B-Roll）  
 > **画幅标准**：**{ratio} ({ratio_title})**  
+> **视觉主题**：**{theme}**  
 > **严格时长约束**：**{duration} 秒（误差建议控制在 ±1 秒以内）**  
 > **推荐总字数**：**{min_words} ~ {max_words} 字**（中文自然语速约 3.5 字/秒，切忌过快或拖沓）
 
@@ -74,9 +91,9 @@ def generate_guide_markdown(title: str, duration: int, core_command: str, ratio:
 
 | 时间戳 | 口播台词 (建议字数) | 真人肢体动作 (Visual Cue) | 对应演示画面 (B-Roll Sync) |
 | :---: | :--- | :--- | :--- |
-| **00:00 - {t1_end:04.1f}s**<br>(破局抛出) | **“还在为繁琐的配置头疼？看这里！”**<br>(约 {act1_words} 字) | • **眼神锁定镜头**，表情微带疑问与共鸣<br>• 身体微微前倾，拉近与观众心理距离 | 终端窗口淡入，光标高频闪烁，准备就绪 |
-| **{t1_end:04.1f} - {t2_end:04.1f}s**<br>(核心演示) | **“只需在终端敲入 `{core_command}`，一键跑通！”**<br>(约 {act2_words} 字) | {gesture_cue} | 键盘极客敲击声起，依赖安装条 0% 飙到 100%，绿色对勾亮起 |
-| **{t2_end:04.1f} - {duration:04.1f}s**<br>(升华行动) | **“立即体验，把时间留给创造。”**<br>(约 {act3_words} 字) | • 嘴角微收露出笃定微笑<br>• **竖起大拇指或点头确认**，眼神持续停留 0.5s 后再按暂停 | 科技高光粒子划过，Pipeline 流式状态初始化完成 |
+| **00:00 - {t1_end:04.1f}s**<br>(第一幕：安装篇) | **{script_act1}**<br>(约 {act1_words} 字) | • **眼神锁定镜头**，表情微带疑问与共鸣<br>• 身体微微前倾，拉近与观众心理距离 | {cue_act1} |
+| **{t1_end:04.1f} - {t2_end:04.1f}s**<br>(第二幕：使用篇) | **{script_act2}**<br>(约 {act2_words} 字) | {gesture_cue} | {cue_act2} |
+| **{t2_end:04.1f} - {duration:04.1f}s**<br>(第三幕：成片篇) | **{script_act3}**<br>(约 {act3_words} 字) | • 嘴角微收露出笃定微笑<br>• **竖起大拇指或点头确认**，眼神持续停留 0.5s 后再按暂停 | {cue_act3} |
 
 ---
 
@@ -96,9 +113,10 @@ def generate_guide_markdown(title: str, duration: int, core_command: str, ratio:
 
 def main():
     parser = argparse.ArgumentParser(description="Generate shooting guide and teleprompter")
-    parser.add_argument("--title", default="Reasonix CLI 演示", help="Video Title")
+    parser.add_argument("--title", default="HyperPresenter Studio 演示", help="Video Title")
     parser.add_argument("--duration", type=int, default=10, help="Target duration in seconds")
-    parser.add_argument("--command", default="npm install -g reasonix", help="Core command/feature mentioned")
+    parser.add_argument("--command", default="npx hyper-presenter setup", help="Core command/feature mentioned")
+    parser.add_argument("--theme", default="ink-wash", help="Visual theme: ink-wash, prismatic-aurora, cyber-dark, etc.")
     parser.add_argument("--ratio", choices=["16:9", "9:16", "all"], default="all", help="Aspect ratio for guide")
     args = parser.parse_args()
 
@@ -109,7 +127,7 @@ def main():
     for r in ratios:
         suffix = "_9x16" if r == "9:16" else ""
         out_file = root_dir / f"CURRENT_SHOOTING_GUIDE{suffix}.md"
-        md_content = generate_guide_markdown(args.title, args.duration, args.command, ratio=r)
+        md_content = generate_guide_markdown(args.title, args.duration, args.command, ratio=r, theme=args.theme)
         with open(out_file, "w", encoding="utf-8") as f:
             f.write(md_content)
 

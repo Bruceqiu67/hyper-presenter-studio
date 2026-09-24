@@ -24,6 +24,9 @@ build/
 *.wav
 *.mp3
 *.m4a
+output/screenshots/
+output/temp_*
+output/*.txt
 !assets/demo_placeholder.*
 
 # OS and Editor files

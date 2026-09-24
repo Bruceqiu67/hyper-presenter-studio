@@ -97,15 +97,45 @@ def ensure_audio_wav(presenter_video_path: Path) -> Path:
     return audio_path
 
 
-def ensure_ring_and_mask(bubble_size: int = 440):
+THEME_RING_COLORS = {
+    "ink-wash": {
+        "glow": (220, 38, 38),       # 朱砂红光晕
+        "core": (220, 38, 38),       # 朱砂印泥实心环
+        "highlight": (217, 119, 6)   # 琥珀金高光
+    },
+    "prismatic-aurora": {
+        "glow": (56, 189, 248),
+        "core": (244, 114, 182),
+        "highlight": (251, 191, 36)
+    },
+    "cyber-dark": {
+        "glow": (56, 189, 248),
+        "core": (56, 189, 248),
+        "highlight": (255, 255, 255)
+    },
+    "matrix-neon": {
+        "glow": (16, 185, 129),
+        "core": (16, 185, 129),
+        "highlight": (167, 243, 208)
+    },
+    "cyber-purple": {
+        "glow": (192, 132, 252),
+        "core": (192, 132, 252),
+        "highlight": (244, 114, 182)
+    }
+}
+
+
+def ensure_ring_and_mask(bubble_size: int = 440, theme: str = "ink-wash"):
     """
     Returns (mask_3ch, ring_rgb_bgr, ring_alpha_3ch).
-    If circle_ring.png / circle_mask.png do not exist in assets/, generates them with Pillow.
+    Generates theme-aware glowing rings and circular masks with Pillow.
     """
     assets_dir = get_project_root() / "assets"
     assets_dir.mkdir(exist_ok=True)
 
-    ring_path = assets_dir / "circle_ring.png"
+    theme_info = THEME_RING_COLORS.get(theme, THEME_RING_COLORS["ink-wash"])
+    ring_path = assets_dir / f"circle_ring_{theme}.png"
     mask_path = assets_dir / "circle_mask.png"
 
     # Generate circle mask if missing
@@ -115,21 +145,26 @@ def ensure_ring_and_mask(bubble_size: int = 440):
         draw.ellipse((2, 2, bubble_size - 2, bubble_size - 2), fill=255)
         mask_img.save(mask_path)
 
-    # Generate glowing cyan neon ring if missing
+    # Generate theme-aware ring if missing
     if not ring_path.exists():
         ring_img = Image.new("RGBA", (bubble_size, bubble_size), (0, 0, 0, 0))
         draw = ImageDraw.Draw(ring_img)
+        glow_rgb = theme_info["glow"]
+        core_rgb = theme_info["core"]
+        hi_rgb = theme_info["highlight"]
+
         # Outer glow
         for width_delta in range(6, 0, -1):
-            alpha = int(40 / width_delta)
+            alpha = int(45 / width_delta)
             draw.ellipse(
                 (width_delta, width_delta, bubble_size - width_delta, bubble_size - width_delta),
-                outline=(56, 189, 248, alpha),
+                outline=(glow_rgb[0], glow_rgb[1], glow_rgb[2], alpha),
                 width=3
             )
-        # Inner solid neon core
-        draw.ellipse((3, 3, bubble_size - 3, bubble_size - 3), outline=(56, 189, 248, 240), width=4)
-        draw.ellipse((4, 4, bubble_size - 4, bubble_size - 4), outline=(255, 255, 255, 180), width=1)
+        # Inner solid core
+        draw.ellipse((3, 3, bubble_size - 3, bubble_size - 3), outline=(core_rgb[0], core_rgb[1], core_rgb[2], 240), width=4)
+        # Highlight accent line
+        draw.ellipse((4, 4, bubble_size - 4, bubble_size - 4), outline=(hi_rgb[0], hi_rgb[1], hi_rgb[2], 200), width=1)
         ring_img.save(ring_path)
 
     mask_img = Image.open(mask_path).convert("L")

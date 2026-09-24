@@ -72,18 +72,101 @@ STYLE_THEMES = {
         "dot_green": "#10b981",
         "tag_bg": "rgba(192, 132, 252, 0.14)",
         "tag_border": "rgba(192, 132, 252, 0.35)",
+    },
+    "prismatic-aurora": {
+        "name": "Prismatic Aurora (极光五彩绚烂风)",
+        "bg_gradient": "radial-gradient(ellipse at 50% 25%, #22123d 0%, #0d081c 55%, #040208 100%)",
+        "primary": "#38bdf8",
+        "secondary": "#f472b6",
+        "accent": "#fbbf24",
+        "window_bg": "rgba(20, 14, 38, 0.84)",
+        "window_border": "rgba(244, 114, 182, 0.38)",
+        "window_glow": "0 24px 80px rgba(192, 132, 252, 0.3), 0 0 60px rgba(56, 189, 248, 0.25)",
+        "text_main": "#ffffff",
+        "text_dim": "#a5b4fc",
+        "dot_red": "#ff4d6d",
+        "dot_yellow": "#ffb703",
+        "dot_green": "#06d6a0",
+        "tag_bg": "linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(244, 114, 182, 0.2))",
+        "tag_border": "rgba(244, 114, 182, 0.5)",
+    },
+    "ink-wash": {
+        "name": "Ink Wash (现代新中式宣白水墨风)",
+        "bg_gradient": "radial-gradient(circle at 50% 35%, #ffffff 0%, #f7f6f0 60%, #eeebe3 100%)",
+        "primary": "#18181b",
+        "secondary": "#dc2626",
+        "accent": "#0d9488",
+        "window_bg": "rgba(255, 255, 255, 0.94)",
+        "window_border": "rgba(24, 24, 27, 0.12)",
+        "window_glow": "0 24px 60px rgba(0, 0, 0, 0.06), 0 2px 10px rgba(0, 0, 0, 0.03)",
+        "text_main": "#18181b",
+        "text_dim": "#52525b",
+        "dot_red": "#dc2626",
+        "dot_yellow": "#d97706",
+        "dot_green": "#059669",
+        "tag_bg": "rgba(220, 38, 38, 0.08)",
+        "tag_border": "rgba(220, 38, 38, 0.3)",
     }
 }
 
 
-def generate_prototype_html(title: str, command: str, feature_desc: str, theme_key: str = "cyber-dark", ratio: str = "16:9") -> str:
+def generate_prototype_html(title: str, command: str, feature_desc: str, theme_key: str = "cyber-dark", ratio: str = "16:9", mode: str = "pipeline") -> str:
     theme = STYLE_THEMES.get(theme_key, STYLE_THEMES["cyber-dark"])
     is_vertical = (ratio == "9:16")
+    is_pipeline_mode = (mode == "pipeline")
 
     # Safe HTML escape to prevent XSS and template breakage
     safe_title = html.escape(title)
     safe_command = html.escape(command)
     safe_desc = html.escape(feature_desc)
+
+    default_block = f"""
+        <div class="info-line">executing command sequence [····················] running</div>
+        <div class="progress-box">
+          <div class="progress-bar"></div>
+        </div>
+        <div class="status-line">
+          <span>✔</span>
+          <span>{safe_title.lower()} ready</span>
+          <span class="highlight-badge">Autonomous Mode</span>
+        </div>
+        <div class="info-line" style="margin-top: 10px;">
+          → {safe_desc}
+        </div>
+        <div class="status-line" style="color: {theme['primary']};">
+          <span>⚡</span>
+          <span>Pipeline Initialized. Ready for streaming.</span>
+        </div>
+    """
+
+    pipeline_block = f"""
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+            <span style="font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: rgba(192,132,252,0.2); color: #c084fc; border: 1px solid rgba(192,132,252,0.4);">Phase 1</span>
+            <span style="flex: 1; font-size: 15px; color: #e2e8f0;">OpenDesign: AI 动态生成高保真极光 UI 原型与 Design Tokens</span>
+            <span style="color: #06d6a0; font-weight: 600; font-size: 14px;">✔ Verified</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+            <span style="font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: rgba(56,189,248,0.2); color: #38bdf8; border: 1px solid rgba(56,189,248,0.4);">Phase 2</span>
+            <span style="flex: 1; font-size: 15px; color: #e2e8f0;">HyperFrames: 纯代码无损编译 1080P 60fps 极客动效 B-Roll</span>
+            <span style="color: #06d6a0; font-weight: 600; font-size: 14px;">✔ 100% 60fps</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+            <span style="font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: rgba(251,191,36,0.2); color: #fbbf24; border: 1px solid rgba(251,191,36,0.4);">Phase 3</span>
+            <span style="flex: 1; font-size: 15px; color: #e2e8f0;">Script Master: 10s 秒级分镜卡点蓝图、手势与眼神视线指引</span>
+            <span style="color: #06d6a0; font-weight: 600; font-size: 14px;">✔ Generated</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+            <span style="font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: rgba(6,214,160,0.2); color: #06d6a0; border: 1px solid rgba(6,214,160,0.4);">Phase 4</span>
+            <span style="flex: 1; font-size: 15px; color: #e2e8f0;">ChatCut Engine: OpenCV 实时人脸追踪重定帧 + 剪映草稿置顶注册</span>
+            <span style="color: #06d6a0; font-weight: 600; font-size: 14px;">✔ Ready</span>
+          </div>
+        </div>
+        <div style="margin-top: 10px; padding: 10px 16px; background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(244,114,182,0.15)); border: 1px solid rgba(244,114,182,0.4); border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 15px; font-weight: 700; color: #ffffff;">🚀 100% 工业化人机协同全流程就绪 · 零人工手动拖拽剪辑</span>
+          <span style="font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 9999px; background: #06d6a0; color: #05030a;">PIPELINE ACTIVE</span>
+        </div>
+    """
 
     # Dimensional configs
     canvas_w = 1080 if is_vertical else 1920
@@ -95,6 +178,10 @@ def generate_prototype_html(title: str, command: str, feature_desc: str, theme_k
     headline_size = "34px" if is_vertical else "40px"
     body_pad = "32px 36px" if is_vertical else "36px 44px"
     font_size_body = "18px" if is_vertical else "20px"
+
+    headline_grad = "linear-gradient(135deg, #ffffff 15%, #38bdf8 35%, #c084fc 60%, #f472b6 80%, #fbbf24 100%)" if theme_key == "prismatic-aurora" else f"linear-gradient(135deg, #ffffff 30%, {theme['primary']} 100%)"
+    progress_grad = "linear-gradient(90deg, #38bdf8, #818cf8, #c084fc, #f472b6, #fbbf24)" if theme_key == "prismatic-aurora" else f"linear-gradient(90deg, {theme['primary']}, {theme['secondary']})"
+    terminal_border = "border: 2px solid transparent; background-image: linear-gradient(rgba(20, 14, 38, 0.92), rgba(20, 14, 38, 0.92)), linear-gradient(135deg, #38bdf8, #c084fc, #f472b6, #fbbf24, #34d399); background-origin: border-box; background-clip: padding-box, border-box;" if theme_key == "prismatic-aurora" else f"border: 1px solid {theme['window_border']}; background: {theme['window_bg']};"
 
     html_content = f"""<!DOCTYPE html>
 <html lang="zh-CN">
@@ -168,12 +255,13 @@ def generate_prototype_html(title: str, command: str, feature_desc: str, theme_k
       color: {theme["primary"]};
       box-shadow: 0 0 20px {theme["tag_bg"]};
     }}
+
     .headline {{
       font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
       font-size: {headline_size};
       font-weight: 800;
       letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #ffffff 30%, {theme["primary"]} 100%);
+      background: {headline_grad};
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-align: center;
@@ -183,8 +271,7 @@ def generate_prototype_html(title: str, command: str, feature_desc: str, theme_k
     .terminal-window {{
       width: {terminal_w};
       height: {terminal_h};
-      background: {theme["window_bg"]};
-      border: 1px solid {theme["window_border"]};
+      {terminal_border}
       border-radius: 20px;
       box-shadow: {theme["window_glow"]};
       backdrop-filter: blur(24px);
@@ -266,7 +353,7 @@ def generate_prototype_html(title: str, command: str, feature_desc: str, theme_k
     .progress-bar {{
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, {theme["primary"]}, {theme["secondary"]});
+      background: {progress_grad};
       border-radius: 999px;
       box-shadow: 0 0 16px {theme["primary"]};
     }}
@@ -335,24 +422,7 @@ def generate_prototype_html(title: str, command: str, feature_desc: str, theme_k
           <span class="cursor"></span>
         </div>
 
-        <div class="info-line">fetching packages [····················] resolve 148 dependencies</div>
-        <div class="progress-box">
-          <div class="progress-bar"></div>
-        </div>
-
-        <div class="status-line">
-          <span>✔</span>
-          <span>{safe_title.lower()} ready</span>
-          <span class="highlight-badge">Zero Configuration</span>
-        </div>
-
-        <div class="info-line" style="margin-top: 10px;">
-          → {safe_desc}
-        </div>
-        <div class="status-line" style="color: {theme["primary"]};">
-          <span>⚡</span>
-          <span>Pipeline Initialized. Ready for streaming.</span>
-        </div>
+        {pipeline_block if is_pipeline_mode else default_block}
       </div>
     </div>
   </div>
@@ -402,9 +472,10 @@ def export_design_tokens(title: str, theme_key: str, output_path: str, ratio: st
 
 def main():
     parser = argparse.ArgumentParser(description="OpenDesign Prototype Generator for HyperPresenter Studio")
-    parser.add_argument("--title", default="Reasonix CLI", help="Project / Tool Title")
-    parser.add_argument("--command", default="npm install -g reasonix && reasonix run", help="Primary command or feature text")
-    parser.add_argument("--desc", default="Decomposing problem into 4 sub-agents: [Analyzer, Designer, Coder, Reviewer]", help="Feature description text")
+    parser.add_argument("--title", default="HyperPresenter Studio", help="Project / Tool Title")
+    parser.add_argument("--command", default="hyper-presenter run pipeline --project 'HyperPresenter Studio'", help="Primary command or feature text")
+    parser.add_argument("--desc", default="4-Phase Autonomous Workflow: Prototype + Motion + Prompter + ChatCut", help="Feature description text")
+    parser.add_argument("--mode", choices=["pipeline", "default"], default="pipeline", help="Display mode: pipeline (4-stage workflow) or default")
     parser.add_argument("--theme", choices=list(STYLE_THEMES.keys()) + ["all"], default="cyber-dark", help="Design theme palette")
     parser.add_argument("--ratio", choices=["16:9", "9:16", "all"], default="all", help="Aspect ratio for prototypes")
     args = parser.parse_args()
@@ -417,6 +488,7 @@ def main():
     print("🎨 OpenDesign Prototype Generator (Dual-Ratio)")
     print(f"📌 Title: {args.title}")
     print(f"💻 Command: {args.command}")
+    print(f"🔄 Mode: {args.mode}")
     print(f"📐 Ratio: {args.ratio}")
     print("=" * 65)
 
@@ -426,7 +498,7 @@ def main():
     for r in ratios_to_generate:
         ratio_tag = "" if r == "16:9" else "_9x16"
         for t in themes_to_generate:
-            html_content = generate_prototype_html(args.title, args.command, args.desc, t, ratio=r)
+            html_content = generate_prototype_html(args.title, args.command, args.desc, t, ratio=r, mode=args.mode)
             out_html = root_dir / f"prototype_{t}{ratio_tag}.html"
             with open(out_html, "w", encoding="utf-8") as f:
                 f.write(html_content)
